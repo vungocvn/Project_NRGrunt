@@ -1,0 +1,141 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model categories {
+  id         BigInt     @id @default(autoincrement()) @db.UnsignedBigInt
+  name       String     @db.VarChar(255)
+  created_at DateTime?  @db.Timestamp(0)
+  updated_at DateTime?  @db.Timestamp(0)
+  products   products[]
+}
+
+model failed_jobs {
+  id         BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  uuid       String   @unique(map: "failed_jobs_uuid_unique") @db.VarChar(255)
+  connection String   @db.Text
+  queue      String   @db.Text
+  payload    String   @db.LongText
+  exception  String   @db.LongText
+  failed_at  DateTime @default(now()) @db.Timestamp(0)
+}
+
+model manager_tokens {
+  token_id   String              @id @db.VarChar(500)
+  token      String              @db.VarChar(255)
+  otp_token  String              @unique(map: "manager_tokens_otp_token_unique") @db.VarChar(255)
+  type       manager_tokens_type
+  email      String              @db.VarChar(255)
+  expires_at DateTime            @db.Timestamp(0)
+}
+
+model migrations {
+  id        Int    @id @default(autoincrement()) @db.UnsignedInt
+  migration String @db.VarChar(255)
+  batch     Int
+}
+
+model per_users {
+  user_id       BigInt      @db.UnsignedBigInt
+  permission_id BigInt      @default(1) @db.UnsignedBigInt
+  created_at    DateTime?   @db.Timestamp(0)
+  updated_at    DateTime?   @db.Timestamp(0)
+  permissions   permissions @relation(fields: [permission_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "per_users_permission_id_foreign")
+  users         users       @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "per_users_user_id_foreign")
+
+  @@id([user_id, permission_id])
+  @@index([permission_id], map: "per_users_permission_id_foreign")
+}
+
+model permissions {
+  id         BigInt      @id @default(autoincrement()) @db.UnsignedBigInt
+  name       String      @db.VarChar(255)
+  created_at DateTime?   @db.Timestamp(0)
+  updated_at DateTime?   @db.Timestamp(0)
+  per_users  per_users[]
+}
+
+model personal_access_tokens {
+  id             BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  tokenable_type String    @db.VarChar(255)
+  tokenable_id   BigInt    @db.UnsignedBigInt
+  name           String    @db.VarChar(255)
+  token          String    @unique(map: "personal_access_tokens_token_unique") @db.VarChar(64)
+  abilities      String?   @db.Text
+  last_used_at   DateTime? @db.Timestamp(0)
+  expires_at     DateTime? @db.Timestamp(0)
+  created_at     DateTime? @db.Timestamp(0)
+  updated_at     DateTime? @db.Timestamp(0)
+
+  @@index([tokenable_type, tokenable_id], map: "personal_access_tokens_tokenable_type_tokenable_id_index")
+}
+
+model products {
+  id          BigInt     @id @default(autoincrement()) @db.UnsignedBigInt
+  name        String     @db.VarChar(255)
+  status      Boolean
+  price       Float
+  image       String     @db.VarChar(255)
+  created_at  DateTime?  @db.Timestamp(0)
+  updated_at  DateTime?  @db.Timestamp(0)
+  category_id BigInt     @db.UnsignedBigInt
+  categories  categories @relation(fields: [category_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "products_category_id_foreign")
+
+  @@index([category_id], map: "products_category_id_foreign")
+}
+
+model role_users {
+  user_id    BigInt    @db.UnsignedBigInt
+  role_id    BigInt    @default(2) @db.UnsignedBigInt
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+  roles      roles     @relation(fields: [role_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "role_users_role_id_foreign")
+  users      users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "role_users_user_id_foreign")
+
+  @@id([user_id, role_id])
+  @@index([role_id], map: "role_users_role_id_foreign")
+}
+
+model roles {
+  id         BigInt       @id @default(autoincrement()) @db.UnsignedBigInt
+  name       String       @unique(map: "roles_name_unique") @db.VarChar(255)
+  created_at DateTime?    @db.Timestamp(0)
+  updated_at DateTime?    @db.Timestamp(0)
+  role_users role_users[]
+}
+
+model transactions {
+  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+}
+
+model users {
+  id                BigInt       @id @default(autoincrement()) @db.UnsignedBigInt
+  hash_code         String       @unique(map: "users_hash_code_unique") @db.VarChar(255)
+  name              String       @db.VarChar(255)
+  email             String       @unique(map: "users_email_unique") @db.VarChar(255)
+  avatar            String?      @default("https://firebasestorage.googleapis.com/v0/b/hotrung1204-36f50.appspot.com/o/Ngoc_Red%2Fdf.jpg?alt=media&token=813909dc-52e3-43d2-b2cd-51c1b912c44e") @db.VarChar(255)
+  password          String       @db.VarChar(255)
+  email_verified_at DateTime?    @db.Timestamp(0)
+  remember_token    String?      @db.VarChar(500)
+  status            Int          @default(0)
+  is_enabled_2fa    Boolean      @default(false)
+  created_at        DateTime?    @db.Timestamp(0)
+  updated_at        DateTime?    @db.Timestamp(0)
+  per_users         per_users[]
+  role_users        role_users[]
+}
+
+enum manager_tokens_type {
+  repassword
+  active
+  login
+  enable_2fa
+  disable_2fa
+}
