@@ -98,31 +98,7 @@ export const ProdDetail: React.FC<Props> = ({onBack, idProduct}) =>  {
             {/* <p>Thoa đều lên da sau khi tắm, massage nhẹ nhàng để sản phẩm thẩm thấu.</p> */}
           </div>
 
-          {/* Đánh giá khách hàng */}
-          {/* <div className="reviews">
-            <h3>Đánh giá khách hàng</h3>
-            <div className="review">
-              <p>
-                <strong>Minh Trí</strong>
-                <i className="fa-solid fa-star"></i>
-                <i className="fa-solid fa-star"></i>
-                <i className="fa-solid fa-star"></i>
-                <i className="fa-solid fa-star"></i>
-                <i className="fa-solid fa-star"></i>
-              </p>
-              <p>Sản phẩm rất tốt, mùi thơm dễ chịu.</p>
-            </div>
-            <div className="review">
-              <p>
-                <strong>Dũng</strong> 
-                <i className="fa-solid fa-star"></i>
-                <i className="fa-solid fa-star"></i>
-                <i className="fa-solid fa-star"></i>
-                <i className="fa-solid fa-star"></i>
-              </p>
-              <p>Chất lượng ổn nhưng hơi mắc.</p>
-            </div>
-          </div> */}
+         
         </div>
       </div>
     </>
