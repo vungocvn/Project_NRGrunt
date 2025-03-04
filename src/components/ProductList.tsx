@@ -16,8 +16,7 @@ export const ProdList: React.FC<Props> = ({onSelectProduct,listProduct,category}
     useEffect(() => {
         setLstProduct(listProduct)
         // getAllProduct()
-        console.log(listProduct)
-    }, [])
+    }, [listProduct])
     return (
     <>
       

@@ -97,8 +97,6 @@ export const ProdDetail: React.FC<Props> = ({onBack, idProduct}) =>  {
             <h3>Cách Dùng</h3> */}
             {/* <p>Thoa đều lên da sau khi tắm, massage nhẹ nhàng để sản phẩm thẩm thấu.</p> */}
           </div>
-
-         
         </div>
       </div>
     </>

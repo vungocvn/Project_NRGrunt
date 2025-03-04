@@ -98,7 +98,7 @@ export default function HeaderComponent({onLogin,onRegister,isLogin, fullName,on
                             <label htmlFor="mobile-search-checkbox" className="header-mobile-search">
                                 <i className="header-mobile-search-icon fa-solid fa-magnifying-glass"></i>
                             </label>
-                            <div className="header-logo hide-on-tablet">
+                            <div className="header-logo">
                                 <img src="../image/logo.png" alt="" className="header-logo-img" onClick={isHome==true?onHome:handleBack}/>
                             </div>
                                 <input type="checkbox" hidden id="mobile-search-checkbox"  className="header-search-checkbox "/>
@@ -147,7 +147,7 @@ export default function HeaderComponent({onLogin,onRegister,isLogin, fullName,on
 
                         </div>
                     </div>
-                    <ul className="header-sort-bar">
+                    {/* <ul className="header-sort-bar">
                          <li className="header-sort-item">
                          <a href="" className="header-sort-link">Liên quan</a>
                          </li>
@@ -160,7 +160,7 @@ export default function HeaderComponent({onLogin,onRegister,isLogin, fullName,on
                          <li className="header-sort-item">
                          <a href="" className="header-sort-link">Giá</a>
                          </li>
-                    </ul>
+                    </ul> */}
             </div>
         </>
     );

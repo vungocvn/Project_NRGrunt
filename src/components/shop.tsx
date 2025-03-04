@@ -143,7 +143,7 @@ export default function Shop() {
                                 {lstCategory.map((item: any) => {
                                     return (
                                         <span className="menu-li" onClick={() => {
-                                            getAllProduct(item.id)
+                                            getAllProduct({ id_category: item.id })
                                             setSelectCategory(item.id)
                                         }}>
 
