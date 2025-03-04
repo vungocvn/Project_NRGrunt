@@ -8,7 +8,7 @@ import HeaderComponent from "./HeaderComponent"
 import { getAllProd } from "../pages/api/api"
 import Cookies from "js-cookie";
 import Banner from "@/components/banner";
-import Sorting from "@/components/sorting";
+import {Sorting} from "@/components/sorting";
 
 export default function Shop() {
     const [selectedProd, setSelectedProd] = useState(null)
@@ -28,9 +28,9 @@ export default function Shop() {
             setOpenModel(false)
         }
     }
-    function getAllProduct(id_category?: number) {
+    function getAllProduct({id_category,sortOder,sort_col}:{id_category?: number,sortOder?:string,sort_col?:string}) {
         setLstProduct([])
-        axios.get("http://127.0.0.1:8000/api/products", { params: { page: 1, page_size: 100, id_category: id_category } })
+        axios.get("http://127.0.0.1:8000/api/products", { params: { page: 1, page_size: 100, id_category: id_category,sort_order:sortOder,sort_col } })
             .then((res) => {
                 if (res.data.status === 200) {
                     setLstProduct(res.data.data.items)
@@ -59,14 +59,14 @@ export default function Shop() {
             });
     }
     useEffect(() => {
-        getAllProduct()
+        getAllProduct({})
         getAllCategory()
     }, [])
 
     const router = useRouter();
 
     const handleRegister = () => {
-        axios.post("http://127.0.0.1:8000/api/users", register)
+        axios.post("http://127.0.0.1:8000/api/users/register", register)
             .then((res) => {
                 if (res.data.status === 201) {
                     const access_token = res.data.token;
@@ -123,7 +123,9 @@ export default function Shop() {
     return (
         <>
             <div className="container">
-                <HeaderComponent onLogin={() => openModelHandler(true)}
+                <HeaderComponent onLogin={() => openModelHandler(true)} 
+                onHome={() =>setSelectedProd(null)}
+                isHome={true}
                     onRegister={() => openModelHandler(false)} isLogin={user != "" ? true : false} fullName={user} />
                 <div className="body-container">
                     <div className="body-container-silder">
@@ -132,7 +134,7 @@ export default function Shop() {
                         <div className="body-silder-menu">
                             <div className="menu-ul">
                                 <span className="menu-li" onClick={() => {
-                                    getAllProduct()
+                                    getAllProduct({})
                                     setSelectCategory(null)
                                 }}>
                                     {selectCategory == null ? <p className="menu-a">Trang chủ</p> : <p className="menu">Trang chủ</p>}
@@ -155,7 +157,10 @@ export default function Shop() {
 
                     <div className="body-container-content">
                         <div className="Sorting">
-                            <Sorting/>
+                            <Sorting onNew={() => getAllProduct({sortOder: "desc",sort_col: "created_at"})}
+                                onSortPrice={(value)=> getAllProduct({sortOder: value.target.value,sort_col: "price"})}
+                                onTrending={() => getAllProduct({sortOder: "desc",sort_col: "discount"})}
+                                />
                         </div>
                         <div className="banner-image w-270 h-50" style={{marginTop: "20px", marginBottom: "20px"}}>
                             <Banner/>
@@ -272,11 +277,11 @@ export default function Shop() {
                     <div className="auth-form">
                         <div className="auth-form-container">
                             {selectAuth ? (<div className="auth-form-header">
-                                <h3 className="auth-form-heading" onClick={() => { setSelectAuth(true) }}>Đăng nhập</h3>
-                                <span className="auth-form-switch-btn" onClick={() => { setSelectAuth(false) }}>Đăng ký</span>
+                                <h3 className="auth-form-switch-btn" onClick={() => { setSelectAuth(true) }}>Đăng nhập</h3>
+                                <span className="auth-form-heading" onClick={() => { setSelectAuth(false) }}>Đăng ký</span>
                             </div>) : (<div className="auth-form-header">
-                                <h3 className="auth-form-heading" onClick={() => setSelectAuth(false)}>Đăng ký</h3>
-                                <span className="auth-form-switch-btn" onClick={() => { setSelectAuth(true) }}>Đăng nhập</span>
+                                <h3 className="auth-form-switch-btn" onClick={() => setSelectAuth(false)}>Đăng ký</h3>
+                                <span className="auth-form-heading" onClick={() => { setSelectAuth(true) }}>Đăng nhập</span>
                             </div>)}
 
 

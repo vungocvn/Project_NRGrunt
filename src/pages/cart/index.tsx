@@ -3,7 +3,7 @@ import HeaderComponent from "@/components/HeaderComponent";
 export default function Category() {
     return (
         <div className="container">
-            <HeaderComponent />
+             <HeaderComponent />   
             <Cart />
         </div>
     )

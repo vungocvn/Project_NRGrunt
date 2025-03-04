@@ -12,10 +12,22 @@
   margin: auto;
   width: 100%;
   background-color: var(--background-color);
+  position: relative;
 }
 .container .header-cover {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
   height: 110px;
   background-color: var(--primary-color);
+}
+.container .banner-image {
+  position: relative;
+  z-index: 1;
+  margin-top: 20px;
+  margin-bottom: 20px;
 }
 .container .body-banner {
   display: flex;
@@ -53,9 +65,6 @@
   display: inline;
   color: #fff;
   margin-top: 4px;
-}
-.container .header-cover-left .header-cover-li .header-cover-span {
-  margin-right: 10px;
 }
 .container .header-cover-left .header-cover-li i {
   margin-right: 10px;
@@ -105,6 +114,7 @@
   display: inline-block;
 }
 .container .header-notification {
+  z-index: 2;
   position: absolute;
   top: 20px;
   margin-top: 10px;
@@ -344,7 +354,7 @@
   position: relative;
 }
 .container .header-with-search .header-search-history {
-  z-index: 1;
+  z-index: 5;
   position: absolute;
   top: calc(100% + 4px);
   left: 0;
@@ -509,10 +519,10 @@
   margin-left: 10px;
 }
 .container .body-container {
-  margin-top: 50px;
+  margin: auto;
+  margin-top: 100px !important;
   display: flex;
   max-width: 1290px;
-  margin: auto;
 }
 .container .category-heading {
   font-size: 1.6rem;
@@ -853,6 +863,8 @@
 }
 
 .modal {
+  position: relative;
+  z-index: 10;
   position: fixed;
   top: 0;
   right: 0;
@@ -886,12 +898,12 @@
   margin-top: 12px;
 }
 .modal .auth-form-container .auth-form-header .auth-form-heading {
-  font-size: 1.3rem;
+  font-size: 1rem;
   font-weight: 400;
   color: #333;
 }
 .modal .auth-form-container .auth-form-header .auth-form-switch-btn {
-  font-size: 1rem;
+  font-size: 1.2rem;
   font-weight: 500;
   color: var(--primary-color);
   cursor: pointer;

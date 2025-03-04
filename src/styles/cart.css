@@ -25,7 +25,9 @@
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   width: 100%;
   max-width: 1000px;
-  overflow-x: auto; /* Tránh tràn khi màn hình nhỏ */
+  position: absolute;
+  bottom: 100px;
+  right: 250px;
 }
 .back-button{
   font-size: 20px;

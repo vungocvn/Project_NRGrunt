@@ -67,7 +67,7 @@ export const Cart: React.FC<Props> = ({onBack}) => {
 
   return (
     <>
-     <div className="cart-container container">
+     <div className="cart-container container-one">
       <h2 className="cart-header">Giỏ hàng</h2>
       <table className="cart-table">
         <thead>

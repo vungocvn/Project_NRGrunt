@@ -1,3 +1,4 @@
+
 @media (min-width: 1023px) {
     .hide-on-mobile-tablet {
         :root{
@@ -6,7 +7,7 @@
         }
         display: none;
         .header-cover{
-            position: fixed;
+           position: fixed;
            top: 0;
            left: 0;
            right: 0;
@@ -14,6 +15,9 @@
         }
         .container{
             margin-top: calc(var(--header-height) + var(--header-sort-bar-height));
+        }
+        .mobile-search-checkbox{
+            display: none !important;
         }
     }
 }
@@ -28,6 +32,12 @@
     .header-sort-bar{
         display: flex;
         z-index: 10;
+    }
+    .container-body {
+        display: none !important;
+    }
+    .header-mobile-search{
+        display: none;
     }
    
 }
@@ -59,6 +69,12 @@
         padding: 0 8px;
         animation: mobileSearchSideIn linear 0.3s;
         display: none;
+    }
+    .header-mobile-search{
+        display: none;
+    }
+    .container-body{
+        display: none !important;
     }
     @keyframes mobileSearchSideIn {
         from{

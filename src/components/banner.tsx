@@ -1,10 +1,9 @@
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
 import "swiper/css";
-
 export default function Banner() {
   return (
-    <Swiper loop={true} autoplay={{ delay: 3000 }} modules={[Autoplay]} className="w-full h-full">
+    <Swiper loop={true} autoplay={{ delay: 5000 }} speed={1000} modules={[Autoplay]} className="w-full h-full relative z-[0]">
       <SwiperSlide>
 <img src="https://media.hcdn.vn/hsk/1740632404hometpcn2702.jpg" alt="" className="banner-img" style={{overflow:"hidden", width:"100%", height:"100%"}}/> 
       </SwiperSlide>
@@ -13,6 +12,12 @@ export default function Banner() {
       </SwiperSlide>
       <SwiperSlide>
         <img src="https://media.hcdn.vn/hsk/1740727286home-hangmoi2802.jpg" alt="" style={{overflow:"hidden", width:"100%", height:"100%"}}/>
+      </SwiperSlide>
+      <SwiperSlide>
+        <img src="https://media.hcdn.vn/hsk/1740800974homelancome0103.jpg" alt="" style={{overflow:"hidden", width:"100%", height:"100%"}}/>
+      </SwiperSlide>
+      <SwiperSlide>
+        <img src="https://media.hcdn.vn/hsk/1740727813homeclk2802.jpg" alt="" style={{overflow:"hidden", width:"100%", height:"100%"}}/>
       </SwiperSlide>
     </Swiper>
   );

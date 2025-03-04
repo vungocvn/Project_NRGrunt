@@ -1,19 +1,19 @@
 import { useRouter } from "next/router";
-export default function HeaderComponent({onLogin,onRegister,isLogin, fullName}:{onLogin?:any,onRegister?:any, isLogin?:boolean, fullName?:string})  {
+import '@/styles/reponsive.css'
+export default function HeaderComponent({onLogin,onRegister,isLogin, fullName,onHome,isHome}:{onLogin?:any,onRegister?:any, isLogin?:boolean, fullName?:string,onHome?:()=> void,isHome?:boolean})  {
     const router = useRouter();
-    
     const handleBack = () => {
         if (window.history.length > 1) {
             router.back();
         } else {
-            router.push("./shop"); 
+            router.push("/shop"); 
         }
     };
     return (
         <>
              <div className="header-cover">
                     <div className="header-tab">
-                        <div className="sub hide-on-tablet hide-on-mobile">
+                        <div className="sub">
                             <div className="header-cover-left">
                                 <ul className="header-cover-ul">
                                     <li className="header-cover-li">
@@ -21,6 +21,8 @@ export default function HeaderComponent({onLogin,onRegister,isLogin, fullName}:{
                                     </li>
                                     <li className="header-cover-li">
                                         <span className="header-cover-span">Kết nối</span>
+                                    </li>  
+                                    <li className="header-cover-li">
                                         <i className="fa-brands fa-facebook"></i>
                                         <i className="fa-brands fa-instagram"></i>
                                     </li>
@@ -97,9 +99,9 @@ export default function HeaderComponent({onLogin,onRegister,isLogin, fullName}:{
                                 <i className="header-mobile-search-icon fa-solid fa-magnifying-glass"></i>
                             </label>
                             <div className="header-logo hide-on-tablet">
-                                <img src="../image/logo.png" alt="" className="header-logo-img"  onClick={()=>{handleBack()}}/>
+                                <img src="../image/logo.png" alt="" className="header-logo-img" onClick={isHome==true?onHome:handleBack}/>
                             </div>
-                                <input type="checkbox" hidden id="mobile-search-checkbox"  className="header-search-checkbox"/>
+                                <input type="checkbox" hidden id="mobile-search-checkbox"  className="header-search-checkbox "/>
                             <div className="header-search">
                                 <div className="header-search-input-wrap">
                                     <input type="text" className="header-search-input" placeholder="Nhập để tìm kiếm sản phẩm" />
