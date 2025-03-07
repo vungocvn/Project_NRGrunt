@@ -22,9 +22,9 @@ export const Sorting:React.FC<Props> = ({onTrending, onNew, onSortPrice}) => {
                 </div>
             </div>
             <div className="pagination">
-                <button>  <i className=" fa-solid fa-angle-left"></i></button>
+                <button><i className=" fa-solid fa-angle-left"></i></button>
                 <span>1/14</span>
-                <button>  <i className=" fa-solid fa-angle-right"></i></button>
+                <button><i className=" fa-solid fa-angle-right"></i></button>
             </div>
     </div>
     );

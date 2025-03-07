@@ -110,13 +110,19 @@ export default function HeaderComponent({onLogin,onRegister,isLogin, fullName,on
                                         <h3 className="header-search-history-heading">Lịch sử tìm kiếm</h3>
                                         <ul className="header-search-history-list">
                                             <li className="header-search-history-item">
-                                                <a href="">Kem dưỡng dạng cream</a>
+                                                <a href="">Sữa rửa mặt</a>
                                             </li>
                                             <li className="header-search-history-item">
-                                                <a href="">Serum chống lão hoá</a>
+                                                <a href="">Kem dưỡng</a>
                                             </li>
                                             <li className="header-search-history-item">
-                                                <a href="">Son kem lì Maybeline</a>
+                                                <a href="">Son môi</a>
+                                            </li>
+                                            <li className="header-search-history-item">
+                                                <a href="">Dầu dưỡng tóc</a>
+                                            </li>
+                                            <li className="header-search-history-item">
+                                                <a href="">Serum</a>
                                             </li>
                                         </ul>
                                     </div>

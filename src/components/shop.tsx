@@ -87,7 +87,7 @@ export default function Shop() {
         axios.post("http://127.0.0.1:8000/api/auth/login", { email: login.email, password: login.password, role: "Customer" })
             .then((res) => {
                 if (res.data.status === 200) {
-                    const access_token = res.data.token;
+                    const access_token = res.data.data['access_token'];
                     Cookies.set('token_cua_Ngoc', access_token, { expires: 1 });
                     alert("Sign up successfully!")
                     setUser(login.email)
@@ -112,11 +112,11 @@ export default function Shop() {
             })
                 .then(response => {
                     if (response.data.status === 200) {
-                        // router.push("/profile")
+                        
                     }
                 })
                 .catch(error => {
-                    // alert("Error: " + error)
+                    
                 });
         }
     }, [router]);
@@ -178,11 +178,9 @@ export default function Shop() {
 
 
                         ) : (
-                            <ProdDetail idProduct={selectedProd['id']} onBack={() => setSelectedProd(null)} />
+                            <ProdDetail  idProduct={selectedProd['id']} onBack={() => setSelectedProd(null)} />
                         )
                         }
-
-
                     </div>
                 </div>
                 <div className="footer">

@@ -16,6 +16,9 @@
 .delete-btn{
   color: red;
 }
+.cart-header-icon-nav{
+  color: var(--primary-color);
+}
 .delete-btn:hover{
   cursor: pointer;
 }
@@ -125,7 +128,7 @@
   cursor: pointer;
   margin-top: 10px;
   display: block;
-  width: 200px;
+  width: 100px;
 }
 
 .checkout-btn:hover {

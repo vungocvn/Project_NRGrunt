@@ -3,6 +3,7 @@ import "@/styles/detail.css"
 import "@/styles/cart.css"
 import "@/styles/color.css"
 import "@/styles/reponsive.css"
+import "@/styles/invoice.css"
 import type { AppProps } from "next/app";
 
 export default function App({ Component, pageProps }: AppProps) {

@@ -78,6 +78,14 @@
     .container-body{
         display: none !important;
     }
+    .body-container-silder{
+        display: none !important;
+    }
+    /* .body-content-nav{
+      width: 200px;
+      height: auto;
+      display: flex;
+    } */
     @keyframes mobileSearchSideIn {
         from{
             opacity: 0;

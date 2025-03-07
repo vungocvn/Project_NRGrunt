@@ -20,7 +20,7 @@ export const ProdList: React.FC<Props> = ({onSelectProduct,listProduct,category}
     return (
     <>
       
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 p-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 p-6 body-content-nav">
           {lstProduct.map((item) => renderItem(item['name'],item['price'],item['image'],()=>{onSelectProduct(item)},
           item['discount'], item['quantity'], item['origin'], item['category_id'], category))}
           
