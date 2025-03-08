@@ -42,6 +42,7 @@ export const Cart: React.FC<Props> = ({ onBack }) => {
         console.log(res.data);
         if (res.data.status === 200 || res.data.status === 201) {
           alert("Order success");
+          router.push("/invoice");
         } else {
           alert("Order fail");
         }

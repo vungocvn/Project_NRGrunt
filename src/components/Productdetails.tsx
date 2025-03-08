@@ -111,8 +111,8 @@ export const ProdDetail: React.FC<Props> = ({ onBack, idProduct }) => {
             </p>
             <p>
               <strong>Giá:</strong>{" "}
-              <span className="discount-price">{formatVND(product?.price)}</span>{" "}
-              <del className="original-price">{formatVND(product?.price * (product?.discount / 100))}</del> (-{product?.discount}%)
+              <span className="discount-price">{formatVND(product?.price-(product?.price * (product?.discount / 100)))}</span>{" "}
+              <del className="original-price">{formatVND(product?.price)}</del> ({product?.discount}%)
             </p>
             <div className="quantity-cell-border" style={{ width: 80, textAlign: "center" }}>
               <span onClick={() => minusQuantity()} className="quantity-btn btn-one ">-</span>
