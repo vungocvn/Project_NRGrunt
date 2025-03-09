@@ -10,6 +10,10 @@ import Cookies from "js-cookie";
 import Banner from "@/components/banner";
 import {Sorting} from "@/components/sorting";
 import exp from "constants";
+import { useDispatch, useSelector } from "react-redux";
+import { setIsLogin, setToken, setUser } from "@/store/slices/authSlice";
+import { setTotal, Total } from "@/store/slices/productsSlice";
+import { LoadingProvider, useLoading } from "./Loading";
 
 export default function Shop() {
     const [selectedProd, setSelectedProd] = useState(null)
@@ -17,10 +21,16 @@ export default function Shop() {
     const [selectAuth, setSelectAuth] = useState(true)
     const [selectCategory, setSelectCategory] = useState(null);
     const [lstProduct, setLstProduct] = useState<any>([])
-    const [user, setUser] = useState("")
+
     const [lstCategory, setLstCategory] = useState<any>([])
     const [register, setRegister] = useState({ name: "", email: "", password: "" })
     const [login, setLogin] = useState({ email: "", password: "", role: "Customer" })
+    const dispatch = useDispatch();
+    const {total, isLoading}:{total:Total, isLoading:boolean} = useSelector((state: any) => ({
+        total: state.product.totalProduct,
+        isLoading: state.product.isLoading
+    }))
+    const {showLoading, hideLoading} = useLoading()
     function openModelHandler(element: boolean) {
         if (!openModel) {
             setSelectAuth(element)
@@ -29,21 +39,23 @@ export default function Shop() {
             setOpenModel(false)
         }
     }
-    function getAllProduct({id_category,sortOder,sort_col}:{id_category?: number,sortOder?:string,sort_col?:string}) {
-        setLstProduct([])
-        axios.get("http://127.0.0.1:8000/api/products", { params: { page: 1, page_size: 100, id_category: id_category,sort_order:sortOder,sort_col } })
+    function getAllProduct({ id_category, sortOder, sort_col, pageIndex }: { id_category?: number, sortOder?: string, sort_col?: string, pageIndex?: number }) {
+        showLoading()
+        setLstProduct([]);
+        axios.get("http://127.0.0.1:8000/api/products", { params: { page: pageIndex || total.pageIndex, page_size: total.pageSize, id_category: id_category, sort_order: sortOder, sort_col } })
             .then((res) => {
                 if (res.data.status === 200) {
-                    setLstProduct(res.data.data.items)
+                    dispatch(setTotal({ ...total, pageIndex: pageIndex || total.pageIndex, totalPage: res.data.data.total_pages, totalProduct: res.data.data.total_items }));
+                    setLstProduct(res.data.data.items);
                 } else {
-                    alert("Sign up error, please try again!")
+                    alert("Sign up error, please try again!");
                 }
+                hideLoading()
             })
             .catch((error) => {
-                alert("Sign up error, please try again!")
+                alert("Sign up error, please try again!");
             });
     }
-
     function getAllCategory() {
 
         axios.get("http://127.0.0.1:8000/api/categories")
@@ -84,21 +96,20 @@ export default function Shop() {
             });
     }
     const handleLogin = () => {
-        console.log(login)
         axios.post("http://127.0.0.1:8000/api/auth/login", { email: login.email, password: login.password, role: "Customer" })
             .then((res) => {
                 if (res.data.status === 200) {
                     const access_token = res.data.data['access_token'];
                     const user = res.data.data;
+                    dispatch(setUser(user)),
+                    dispatch(setIsLogin(true)),
+                    dispatch(setToken(access_token))
                     Cookies.set('token_cua_Ngoc', access_token, { expires: 1 });
-                    Cookies.set('isLogin', 'true', {expires: 1});
-                    localStorage.setItem('user', JSON.stringify(user));
-
-                    alert("Sign up successfully!")
-                    setUser(login.email)
+                    alert("Đăng nhập thành công!")
+                    // setUser(login.email)
                     openModelHandler(true)
                 } else {
-                    alert("Sign up error, please try again!")
+                    alert("Đăng nhập thất bại, xin vui lòng thử lại!")
                 }
             })
             .catch((error) => {
@@ -126,12 +137,12 @@ export default function Shop() {
         }
     }, [router]);
     return (
-        <>
+        <LoadingProvider >
             <div className="container">
                 <HeaderComponent onLogin={() => openModelHandler(true)} 
                 onHome={() =>setSelectedProd(null)}
                 isHome={true}
-                    onRegister={() => openModelHandler(false)} isLogin={user != "" ? true : false} fullName={user} />
+                    onRegister={() => openModelHandler(false)}/>
                 <div className="body-container">
                     <div className="body-container-silder">
                         <h2 className="category-heading ">
@@ -162,10 +173,28 @@ export default function Shop() {
 
                     <div className="body-container-content">
                         <div className="Sorting">
-                            <Sorting onNew={() => getAllProduct({sortOder: "desc",sort_col: "created_at"})}
-                                onSortPrice={(value)=> getAllProduct({sortOder: value.target.value,sort_col: "price"})}
-                                onTrending={() => getAllProduct({sortOder: "desc",sort_col: "discount"})}
-                                />
+                            <Sorting
+                                onNew={() => getAllProduct({ sortOder: "desc", sort_col: "created_at" })}
+                                onSortPrice={(value) => getAllProduct({ sortOder: value.target.value, sort_col: "price" })}
+                                onTrending={() => getAllProduct({ sortOder: "desc", sort_col: "discount" })}
+                                page={`${total.pageIndex}/${total.totalPage}`}
+                                onNextPage={() => {
+                                    if (total.pageIndex < total.totalPage) {
+                                        const newPageIndex = total.pageIndex + 1;
+                                        dispatch(setTotal({ ...total, pageIndex: newPageIndex }));
+                                        setTimeout(() => {
+                                            getAllProduct({ id_category: selectCategory ?? undefined, pageIndex: newPageIndex });
+                                        }, 1000);
+                                    }
+                                }}
+                                onPrevPage={() => {
+                                    if (total.pageIndex > 1) {
+                                        const newPageIndex = total.pageIndex - 1;
+                                        dispatch(setTotal({ ...total, pageIndex: newPageIndex }));
+                                        getAllProduct({ id_category: selectCategory ?? undefined, pageIndex: newPageIndex });
+                                    }
+                                }}
+                            />
                         </div>
                         <div className="banner-image w-270 h-50" style={{marginTop: "20px", marginBottom: "20px"}}>
                             <Banner/>
@@ -319,9 +348,7 @@ export default function Shop() {
                 </div>
 
             </div>
-
-
-        </>
+        </LoadingProvider>
     )
 }
 const formLogin = ({ email, password, setEmail, setPassword }: { email: string, password: string, setEmail: (e: ChangeEvent<HTMLInputElement>) => void, setPassword: (e: ChangeEvent<HTMLInputElement>) => void }) => {
