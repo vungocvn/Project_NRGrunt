@@ -9,6 +9,7 @@ import { getAllProd } from "../pages/api/api"
 import Cookies from "js-cookie";
 import Banner from "@/components/banner";
 import {Sorting} from "@/components/sorting";
+import exp from "constants";
 
 export default function Shop() {
     const [selectedProd, setSelectedProd] = useState(null)
@@ -88,7 +89,11 @@ export default function Shop() {
             .then((res) => {
                 if (res.data.status === 200) {
                     const access_token = res.data.data['access_token'];
+                    const user = res.data.data;
                     Cookies.set('token_cua_Ngoc', access_token, { expires: 1 });
+                    Cookies.set('isLogin', 'true', {expires: 1});
+                    localStorage.setItem('user', JSON.stringify(user));
+
                     alert("Sign up successfully!")
                     setUser(login.email)
                     openModelHandler(true)

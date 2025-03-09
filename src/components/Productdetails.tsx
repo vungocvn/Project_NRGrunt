@@ -87,8 +87,8 @@ export const ProdDetail: React.FC<Props> = ({ onBack, idProduct }) => {
       });
   }, [id]);
   function formatVND(amount: any) {
-
-    return amount.toLocaleString("vi-VN", { style: "currency", currency: "VND" });
+    var formatter = parseFloat(amount);
+    return formatter.toLocaleString("vi-VN", { style: "currency", currency: "VND" });
   }
   return (
 
@@ -99,8 +99,8 @@ export const ProdDetail: React.FC<Props> = ({ onBack, idProduct }) => {
         {/* Ảnh sản phẩm */}
         <div className="product-cover">
           <div className="product-gallery">
-            {/* <img src={product?.image} alt="" className="product-image" /> */}
-            <img src="./image/svr.jfif" alt="" />
+            <img src={product?.image} alt="" className="product-image" style={{width:'100%', height:'50%',objectFit:'cover'}} />
+            {/* <img src="./image/svr.jfif" alt="" /> */}
           </div>
 
           {/* Thông tin sản phẩm */}

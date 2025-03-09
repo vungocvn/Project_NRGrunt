@@ -69,14 +69,15 @@ const renderItem = (title:any,price:any,image:any,onclick?:()=>void, discount?: 
     let category_item = category?.length!=undefined? category.filter((item:any) => item['id'] == category_id)[0]:null;
     let category_name = category_item !=null? category_item['name']:'';
     function formatVND(amount:any) {
-        return amount.toLocaleString("vi-VN", { style: "currency", currency: "VND" });
+        var formatter = parseFloat(amount);
+        return formatter.toLocaleString("vi-VN", { style: "currency", currency: "VND" });
     }
     return(
         <div className="content-cover-nav-one" onClick={onclick}>
         <div className="content-cover-sub">
             <div className="content-cover-image">
-                <img src="./image/la1.webp" alt="" />
-                {/* <img src={image} alt="" /> */}
+                {/* <img src="./image/la1.webp" alt="" /> */}
+                <img src={image} alt="" />
             </div>
 
             <div className="favourite"> <i className="fa-solid fa-check"></i> Yêu thích</div>
