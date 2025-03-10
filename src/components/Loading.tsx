@@ -1,29 +1,28 @@
 "use client";
-import { createContext, useContext, useState } from "react";
-import "../styles/loading.css"; // Import CSS file
+import styles from "../styles/loading.module.css";
 
-const LoadingContext = createContext({
-  loading: false,
-  showLoading: () => {},
-  hideLoading: () => {},
-});
-
-export function LoadingProvider({ children }: { children: React.ReactNode }) {
-  const [loading, setLoading] = useState(false);
-
-  const showLoading = () => setLoading(true);
-  const hideLoading = () => setLoading(false);
-
+const LoadingScreen = () => {
+  // const text = "Vui lòng đợi...";
+  const text = "Loading...";
   return (
-    <LoadingContext.Provider value={{ loading, showLoading, hideLoading }}>
-      {loading && (
-        <div className="loading-overlay">
-          <div className="loading-spinner"></div>
-        </div>
-      )}
-      {children}
-    </LoadingContext.Provider>
+    <div className={styles.loadingScreen}>
+      <div className={styles.spinner}></div>
+      {/* <p style={{color:'#fff', fontStyle:'normal',fontWeight:'bold', fontSize:14}}>Vui lòng đợi...</p>
+       */}
+      <div className={styles.wavyText}>
+        <span>N</span>
+        <span>G</span>
+        <span>R</span>
+        <span>U</span>
+        <span>N</span>
+        <span>T</span>
+        <span>.</span>
+        <span>.</span>
+        <span>.</span>
+        <span>.</span>
+      </div>
+    </div>
   );
-}
+};
 
-export const useLoading = () => useContext(LoadingContext);
+export default LoadingScreen;
