@@ -2,9 +2,12 @@ import "@/styles/product.css";
 interface Props { 
     onTrending?: () => void,
     onNew?: () => void,
-    onSortPrice?: (value: React.ChangeEvent<HTMLSelectElement>) => void
+    onSortPrice?: (value: React.ChangeEvent<HTMLSelectElement>) => void,
+    page?: string,
+    onNextPage?: () => void,
+    onPrevPage?: () => void
 }
-export const Sorting:React.FC<Props> = ({onTrending, onNew, onSortPrice}) => {
+export const Sorting:React.FC<Props> = ({onTrending, onNew, onSortPrice, page,onNextPage,onPrevPage}) => {
     return (
         <div className="container-body">
             <div className="sorting-section">
@@ -22,9 +25,9 @@ export const Sorting:React.FC<Props> = ({onTrending, onNew, onSortPrice}) => {
                 </div>
             </div>
             <div className="pagination">
-                <button><i className=" fa-solid fa-angle-left"></i></button>
-                <span>1/14</span>
-                <button><i className=" fa-solid fa-angle-right"></i></button>
+                <button onClick={onPrevPage}><i className=" fa-solid fa-angle-left"></i></button>
+                <span>{page ?? '1/1'}</span>
+                <button onClick={onNextPage}><i className=" fa-solid fa-angle-right"></i></button>
             </div>
     </div>
     );
