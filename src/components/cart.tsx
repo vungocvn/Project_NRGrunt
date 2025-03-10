@@ -137,7 +137,7 @@ export const Cart: React.FC<Props> = ({ onBack }) => {
   };
 
   const totalPrice = cartItems.reduce((sum, item) => sum + parseFloat(item.price) * item.quantity, 0);
-  const vat = totalPrice * 0.02;
+  const vat = totalPrice * 0.01;
   const shippingFee = 50000;
   const finalTotal = totalPrice + vat + shippingFee;
   function formatVND(amount:any) {

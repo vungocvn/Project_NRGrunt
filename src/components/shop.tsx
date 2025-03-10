@@ -8,7 +8,7 @@ import HeaderComponent from "./HeaderComponent"
 import { getAllProd } from "../pages/api/api"
 import Cookies from "js-cookie";
 import Banner from "@/components/banner";
-import {Sorting} from "@/components/sorting";
+import { Sorting } from "@/components/sorting";
 
 export default function Shop() {
     const [selectedProd, setSelectedProd] = useState(null)
@@ -20,6 +20,7 @@ export default function Shop() {
     const [lstCategory, setLstCategory] = useState<any>([])
     const [register, setRegister] = useState({ name: "", email: "", password: "" })
     const [login, setLogin] = useState({ email: "", password: "", role: "Customer" })
+
     function openModelHandler(element: boolean) {
         if (!openModel) {
             setSelectAuth(element)
@@ -28,9 +29,10 @@ export default function Shop() {
             setOpenModel(false)
         }
     }
-    function getAllProduct({id_category,sortOder,sort_col}:{id_category?: number,sortOder?:string,sort_col?:string}) {
+
+    function getAllProduct({ id_category, sortOder, sort_col }: { id_category?: number, sortOder?: string, sort_col?: string }) {
         setLstProduct([])
-        axios.get("http://127.0.0.1:8000/api/products", { params: { page: 1, page_size: 100, id_category: id_category,sort_order:sortOder,sort_col } })
+        axios.get("http://127.0.0.1:8000/api/products", { params: { page: 1, page_size: 100, id_category: id_category, sort_order: sortOder, sort_col } })
             .then((res) => {
                 if (res.data.status === 200) {
                     setLstProduct(res.data.data.items)
@@ -44,7 +46,6 @@ export default function Shop() {
     }
 
     function getAllCategory() {
-
         axios.get("http://127.0.0.1:8000/api/categories")
             .then((res) => {
                 if (res.data.status === 200) {
@@ -58,6 +59,7 @@ export default function Shop() {
                 console.error("Error in sign up", error);
             });
     }
+
     useEffect(() => {
         getAllProduct({})
         getAllCategory()
@@ -82,6 +84,7 @@ export default function Shop() {
                 console.error("Error in sign up", error);
             });
     }
+
     const handleLogin = () => {
         console.log(login)
         axios.post("http://127.0.0.1:8000/api/auth/login", { email: login.email, password: login.password, role: "Customer" })
@@ -112,25 +115,33 @@ export default function Shop() {
             })
                 .then(response => {
                     if (response.data.status === 200) {
-                        
+                        // User is authenticated
                     }
                 })
                 .catch(error => {
-                    
+                    // Handle error
                 });
         }
     }, [router]);
+
     return (
         <>
             <div className="container">
-                <HeaderComponent onLogin={() => openModelHandler(true)} 
-                onHome={() =>setSelectedProd(null)}
-                isHome={true}
-                    onRegister={() => openModelHandler(false)} isLogin={user != "" ? true : false} fullName={user} />
+                <HeaderComponent
+                    onLogin={() => openModelHandler(true)}
+                    onHome={() => {
+                        setSelectedProd(null);
+                        setSelectCategory(null);
+                        getAllProduct({});
+                    }}
+                    isHome={true}
+                    onRegister={() => openModelHandler(false)}
+                    isLogin={user !== ""}
+                    fullName={user}
+                />
                 <div className="body-container">
                     <div className="body-container-silder">
-                        <h2 className="category-heading ">
-                            Danh mục</h2>
+                        <h2 className="category-heading">Danh mục</h2>
                         <div className="body-silder-menu">
                             <div className="menu-ul">
                                 <span className="menu-li" onClick={() => {
@@ -138,7 +149,7 @@ export default function Shop() {
                                     setSelectCategory(null)
                                 }}>
                                     {selectCategory == null ? <p className="menu-a">Trang chủ</p> : <p className="menu">Trang chủ</p>}
-                                </span >
+                                </span>
 
                                 {lstCategory.map((item: any) => {
                                     return (
@@ -146,7 +157,6 @@ export default function Shop() {
                                             getAllProduct({ id_category: item.id })
                                             setSelectCategory(item.id)
                                         }}>
-
                                             {selectCategory == item.id ? <p className="menu-a">{item.name}</p> : <p className="menu">{item.name}</p>}
                                         </span>
                                     )
@@ -157,30 +167,28 @@ export default function Shop() {
 
                     <div className="body-container-content">
                         <div className="Sorting">
-                            <Sorting onNew={() => getAllProduct({sortOder: "desc",sort_col: "created_at"})}
-                                onSortPrice={(value)=> getAllProduct({sortOder: value.target.value,sort_col: "price"})}
-                                onTrending={() => getAllProduct({sortOder: "desc",sort_col: "discount"})}
-                                />
+                            <Sorting
+                                onNew={() => getAllProduct({ sortOder: "desc", sort_col: "created_at" })}
+                                onSortPrice={(value) => getAllProduct({ sortOder: value.target.value, sort_col: "price" })}
+                                onTrending={() => getAllProduct({ sortOder: "desc", sort_col: "discount" })}
+                            />
                         </div>
-                        <div className="banner-image w-270 h-50" style={{marginTop: "20px", marginBottom: "20px"}}>
-                            <Banner/>
+                        <div className="banner-image w-270 h-50" style={{ marginTop: "20px", marginBottom: "20px" }}>
+                            <Banner />
                         </div>
                         {selectedProd == null ? (
                             lstProduct.length > 0 && (
-                                <ProdList onSelectProduct={(e) => {
-                                    setSelectedProd(e)
-                                }}
+                                <ProdList
+                                    onSelectProduct={(e) => {
+                                        setSelectedProd(e)
+                                    }}
                                     listProduct={lstProduct}
                                     category={lstCategory}
-
                                 />
                             )
-
-
                         ) : (
-                            <ProdDetail  idProduct={selectedProd['id']} onBack={() => setSelectedProd(null)} />
-                        )
-                        }
+                            <ProdDetail idProduct={selectedProd['id']} onBack={() => setSelectedProd(null)} />
+                        )}
                     </div>
                 </div>
                 <div className="footer">
@@ -314,13 +322,11 @@ export default function Shop() {
                 </div>
 
             </div>
-
-
         </>
     )
 }
-const formLogin = ({ email, password, setEmail, setPassword }: { email: string, password: string, setEmail: (e: ChangeEvent<HTMLInputElement>) => void, setPassword: (e: ChangeEvent<HTMLInputElement>) => void }) => {
 
+const formLogin = ({ email, password, setEmail, setPassword }: { email: string, password: string, setEmail: (e: ChangeEvent<HTMLInputElement>) => void, setPassword: (e: ChangeEvent<HTMLInputElement>) => void }) => {
     return (
         <div className="auth-form-form">
             <div className="auth-form-group">
@@ -332,23 +338,19 @@ const formLogin = ({ email, password, setEmail, setPassword }: { email: string, 
         </div>
     )
 };
-const formRegister = ({ name, email, password, setName, setEmail, setPassword }: { name: string, email: string, password: string, setName: (e: ChangeEvent<HTMLInputElement>) => void, setEmail: (e: ChangeEvent<HTMLInputElement>) => void, setPassword: (e: ChangeEvent<HTMLInputElement>) => void }) => {
 
+const formRegister = ({ name, email, password, setName, setEmail, setPassword }: { name: string, email: string, password: string, setName: (e: ChangeEvent<HTMLInputElement>) => void, setEmail: (e: ChangeEvent<HTMLInputElement>) => void, setPassword: (e: ChangeEvent<HTMLInputElement>) => void }) => {
     return (
         <div className="auth-form-register">
             <div className="auth-form-group">
-                <input type="text" className="auth-form-input" placeholder="Tên của bạn "
-                    value={name} onChange={setName} name="name" />
+                <input type="text" className="auth-form-input" placeholder="Tên của bạn " value={name} onChange={setName} name="name" />
             </div>
             <div className="auth-form-group">
-                <input type="text" className="auth-form-input" placeholder="Email của bạn "
-                    value={email} onChange={setEmail} />
+                <input type="text" className="auth-form-input" placeholder="Email của bạn " value={email} onChange={setEmail} />
             </div>
             <div className="auth-form-group">
-                <input type="password" className="auth-form-input" placeholder="Mật khẩu của bạn "
-                    value={password} onChange={setPassword} />
+                <input type="password" className="auth-form-input" placeholder="Mật khẩu của bạn " value={password} onChange={setPassword} />
             </div>
         </div>
-
     )
 };
