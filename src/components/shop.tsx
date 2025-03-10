@@ -9,17 +9,20 @@ import { getAllProd } from "../pages/api/api";
 import Cookies from "js-cookie";
 import Banner from "@/components/banner";
 import { Sorting } from "@/components/sorting";
+
 import exp from "constants";
 import { useDispatch, useSelector } from "react-redux";
 import { setIsLogin, setToken, setUser } from "@/store/slices/authSlice";
 import { setDataProduct, setLoading, setTotal, Total } from "@/store/slices/productsSlice";
 import LoadingScreen from "./Loading";
 
+
 export default function Shop() {
     const [selectedProd, setSelectedProd] = useState(null);
     const [openModel, setOpenModel] = useState(false);
     const [selectAuth, setSelectAuth] = useState(true);
     const [selectCategory, setSelectCategory] = useState(null);
+
 
     const [lstCategory, setLstCategory] = useState<any>([]);
     const [register, setRegister] = useState({ name: "", email: "", password: "" });
@@ -30,6 +33,7 @@ export default function Shop() {
         isLoading: state.product.isLoading,
         dataProduct: state.product.dataProduct
     }));
+
     function openModelHandler(element: boolean) {
         if (!openModel) {
             setSelectAuth(element);
@@ -38,6 +42,7 @@ export default function Shop() {
             setOpenModel(false);
         }
     }
+
     function getAllProduct({ id_category, sortOder, sort_col, pageIndex }: { id_category?: number; sortOder?: string; sort_col?: string; pageIndex?: number }) {
         try {
             dispatch(setDataProduct([]));
@@ -61,6 +66,7 @@ export default function Shop() {
         } finally {
             dispatch(setLoading(false));
         }
+
     }
     function getAllCategory() {
         axios
@@ -77,6 +83,7 @@ export default function Shop() {
                 console.error("Error in sign up", error);
             });
     }
+
     useEffect(() => {
         setTimeout(() => {
             getAllProduct({})
@@ -104,6 +111,7 @@ export default function Shop() {
             .catch((error) => {
                 console.error("Error in sign up", error);
             });
+
     };
     const handleLogin = async () => {
         try {
@@ -137,6 +145,7 @@ export default function Shop() {
 
     };
 
+
     useEffect(() => {
         const token = Cookies.get("token_cua_Ngoc") || "";
 
@@ -153,14 +162,18 @@ export default function Shop() {
                 )
                 .then((response) => {
                     if (response.data.status === 200) {
+
                     }
                 })
                 .catch((error) => { });
+
         }
     }, [router]);
+
     return (
         <>
             <div className="container">
+
                 <HeaderComponent onLogin={() => openModelHandler(true)} onHome={() => setSelectedProd(null)} isHome={true} onRegister={() => openModelHandler(false)} />
                 <div className="body-container">
                     <div className="body-container-silder">
@@ -179,6 +192,7 @@ export default function Shop() {
 
                                 {lstCategory.map((item: any) => {
                                     return (
+
                                         <span
                                             className="menu-li"
                                             onClick={() => {
@@ -186,6 +200,7 @@ export default function Shop() {
                                                 setSelectCategory(item.id);
                                             }}
                                         >
+
                                             {selectCategory == item.id ? <p className="menu-a">{item.name}</p> : <p className="menu">{item.name}</p>}
                                         </span>
                                     );
@@ -200,6 +215,7 @@ export default function Shop() {
                                 onNew={() => getAllProduct({ sortOder: "desc", sort_col: "created_at" })}
                                 onSortPrice={(value) => getAllProduct({ sortOder: value.target.value, sort_col: "price" })}
                                 onTrending={() => getAllProduct({ sortOder: "desc", sort_col: "discount" })}
+
                                 page={`${total.pageIndex}/${total.totalPage}`}
                                 onNextPage={() => {
                                     if (total.pageIndex < total.totalPage) {
@@ -221,23 +237,28 @@ export default function Shop() {
                                         }, 1500);
                                     }
                                 }}
+
                             />
                         </div>
                         <div className="banner-image w-270 h-50" style={{ marginTop: "20px", marginBottom: "20px" }}>
                             <Banner />
                         </div>
                         {selectedProd == null ? (
+
                             dataProduct.length > 0 && (
                                 <ProdList
                                     onSelectProduct={(e) => {
                                         setSelectedProd(e);
                                     }}
                                     listProduct={dataProduct}
+
                                     category={lstCategory}
                                 />
                             )
                         ) : (
+
                             <ProdDetail idProduct={selectedProd["id"]} onBack={() => setSelectedProd(null)} />
+
                         )}
                     </div>
                 </div>
@@ -443,11 +464,15 @@ export default function Shop() {
                     </div>
                 </div>
             </div>
+
             {isLoading && <LoadingScreen />}
+
         </>
     );
 }
+
 const formLogin = ({ email, password, setEmail, setPassword }: { email: string; password: string; setEmail: (e: ChangeEvent<HTMLInputElement>) => void; setPassword: (e: ChangeEvent<HTMLInputElement>) => void }) => {
+
     return (
         <div className="auth-form-form">
             <div className="auth-form-group">
@@ -459,7 +484,9 @@ const formLogin = ({ email, password, setEmail, setPassword }: { email: string; 
         </div>
     );
 };
+
 const formRegister = ({ name, email, password, setName, setEmail, setPassword }: { name: string; email: string; password: string; setName: (e: ChangeEvent<HTMLInputElement>) => void; setEmail: (e: ChangeEvent<HTMLInputElement>) => void; setPassword: (e: ChangeEvent<HTMLInputElement>) => void }) => {
+
     return (
         <div className="auth-form-register">
             <div className="auth-form-group">
@@ -472,5 +499,7 @@ const formRegister = ({ name, email, password, setName, setEmail, setPassword }:
                 <input type="password" className="auth-form-input" placeholder="Mật khẩu của bạn " value={password} onChange={setPassword} />
             </div>
         </div>
+
     );
 };
+
