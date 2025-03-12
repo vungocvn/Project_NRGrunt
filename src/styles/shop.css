@@ -15,6 +15,7 @@
   position: relative;
 }
 .container .header-cover {
+  width: 100%;
   position: fixed;
   top: 0;
   left: 0;
@@ -396,12 +397,31 @@
   height: 100%;
   border: none;
   outline: none;
-  font-size: 0.9rem;
   padding: 0 16px;
 }
 .container .header-with-search .header-cart {
   width: 150px;
   text-align: center;
+}
+.container .header-with-search .header-cart-wrap {
+  position: relative;
+}
+.container .header-with-search .header-cart-quantity {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  color: #fff;
+  background-color: #f6432e;
+  width: 20px;
+  text-align: center;
+  vertical-align: middle;
+  height: 20px;
+  border-radius: 50%;
+  font-weight: 500;
+  font-size: 12PX;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .container .header-with-search .header-cart-icon {
   color: #fff;
@@ -411,45 +431,11 @@
 .container .header-with-search .header-cart-icon:hover {
   cursor: pointer;
 }
-.container .header-sort-bar {
-  position: fixed;
-  top: var(--header-height);
-  left: 0;
-  right: 0;
-  height: var(--header-sort-bar-height);
-  background-color: var(--white-color);
-  margin: 0;
-  padding-left: 0;
-  border-top: 1px solid #e5e5e5;
-  border-bottom: 1px solid #e5e5e5;
-  display: none;
-}
-.container .header-sort-link {
-  text-align: center;
-  height: 100%;
-  line-height: var(--header-sort-bar-height);
-  color: var(--text-color);
-  font-size: 1.2rem;
-  display: block;
-  position: relative;
-}
-.container .header-sort-link::before {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 0;
-  height: 60%;
-  border-left: 1px solid #e5e5e5;
-  transform: translateY(-50%);
-}
-.container .header-sort-item-active .header-sort-link {
-  color: var(--primary-color);
-}
-.container .header-sort-item {
-  flex: 1;
-}
-.container .header-sort-item:first-child .header-sort-link::before {
-  display: none;
+.container .body-container {
+  margin: auto;
+  margin-top: 100px !important;
+  display: flex;
+  max-width: 1290px;
 }
 .container .body-container-silder {
   flex: 1.5;
@@ -517,12 +503,6 @@
   outline: none;
   border-radius: 5px;
   margin-left: 10px;
-}
-.container .body-container {
-  margin: auto;
-  margin-top: 100px !important;
-  display: flex;
-  max-width: 1290px;
 }
 .container .category-heading {
   font-size: 1.6rem;

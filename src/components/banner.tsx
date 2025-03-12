@@ -19,6 +19,9 @@ export default function Banner() {
       <SwiperSlide>
         <img src="https://media.hcdn.vn/hsk/1740727813homeclk2802.jpg" alt="" style={{overflow:"hidden", width:"100%", height:"100%"}}/>
       </SwiperSlide>
+      <SwiperSlide>
+        <img src="https://media.hcdn.vn/hsk/1741681982homeobagi1103.png" alt="" style={{overflow:"hidden", width:"100%", height:"100%"}}/>
+      </SwiperSlide>
     </Swiper>
   );
 }

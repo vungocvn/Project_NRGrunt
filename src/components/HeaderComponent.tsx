@@ -213,8 +213,11 @@ export default function HeaderComponent({ onLogin, onRegister, fullName, onHome,
                                 <i className="header-search-btn-icon fa-solid fa-magnifying-glass"></i>
                             </button>
                         </div>
-                        <div className="header-cart ">
-                            <i className="header-cart-icon fa-solid fa-cart-shopping" onClick={() => router.push("/cart")}></i>
+                        <div className="header-cart">
+                            <i className="header-cart-icon fa-solid fa-cart-shopping header-cart-wrap" onClick={() => router.push("/cart")}>
+                                <p className="header-cart-quantity">3</p>
+                            </i>
+                            
                         </div>
                     </div>
                 </div>

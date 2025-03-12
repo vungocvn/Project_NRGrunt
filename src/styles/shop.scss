@@ -13,7 +13,7 @@
     background-color:var(--background-color);
     position: relative;
      .header-cover{  
-      width: 1200px;     
+      width: 100%;     
         position: fixed; 
         top: 0;
         left: 0;
@@ -430,13 +430,33 @@
          height: 100%;
          border: none;
          outline: none;
-         font-size: 0.9rem;
          padding: 0 16px;
       }
       .header-cart{
          width: 150px;
          text-align: center;
      
+      }
+      .header-cart-wrap{
+         position: relative;
+      }
+      .header-cart-quantity{
+         position: absolute;
+         top: -12px;
+         right: -12px;
+         color: #fff;
+         background-color: #f6432e;
+         width: 20px;
+         text-align: center;
+         vertical-align: middle;
+         height: 20px;
+         border-radius: 50%;
+        font-weight: 500;
+         font-size: 12PX;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+         
       }
       .header-cart-icon{
          color: #fff;

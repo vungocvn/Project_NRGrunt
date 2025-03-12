@@ -11,10 +11,10 @@
   "dependencies": {
     "@prisma/client": "^6.4.1",
     "@reduxjs/toolkit": "^2.6.1",
-    "@tailwindcss/postcss": "^4.0.9",
+    "@tailwindcss/postcss": "^4.0.12",
     "axios": "^1.7.9",
     "js-cookie": "^3.0.5",
-    "next": "15.1.7",
+    "next": "^15.1.7",
     "prisma": "^6.4.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

@@ -174,10 +174,18 @@ export default function Shop() {
         <>
             <div className="container">
 
-                <HeaderComponent onLogin={() => openModelHandler(true)} onHome={() => setSelectedProd(null)} isHome={true} onRegister={() => openModelHandler(false)} />
+                <HeaderComponent onLogin={() => openModelHandler(true)} onHome={() => {
+                    dispatch(setLoading(true));
+                    setTimeout(() => {
+                        getAllProduct({});
+                    }, 1500);
+                    setSelectCategory(null);
+                    setSelectedProd(null)
+                }} isHome={true} onRegister={() => openModelHandler(false)} 
+                 />
                 <div className="body-container">
                     <div className="body-container-silder">
-                        <h2 className="category-heading ">Danh mục</h2>
+                        <h2 className="category-heading">Danh mục</h2>
                         <div className="body-silder-menu">
                             <div className="menu-ul">
                                 <span
