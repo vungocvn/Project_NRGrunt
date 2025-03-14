@@ -1,4 +1,5 @@
 // store/slices/counterSlice.ts
+import { setSearch } from "@/store/slices/productsSlice";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface AuthState {
