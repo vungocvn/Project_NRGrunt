@@ -5,6 +5,8 @@ import { useRouter } from "next/router";
 import axios from "axios";
 import { get } from "http";
 import Cookies from "js-cookie";
+import { useDispatch, useSelector } from "react-redux";
+import { setCount } from "@/store/slices/productsSlice";
 
 interface Props {
   onBack: (product: any) => void
@@ -19,6 +21,7 @@ interface CartItem {
   user_id: number
 }
 export const Cart: React.FC<Props> = ({ onBack }) => {
+  const dispatch = useDispatch();
   const router = useRouter();
   const [openModel, setOpenModel] = useState(false)
   const [selectAuth, setSelectAuth] = useState(true)
@@ -30,12 +33,14 @@ export const Cart: React.FC<Props> = ({ onBack }) => {
       setOpenModel(false)
     }
   }
+  const {token} = useSelector((state:any)=>({
+    token : state.auth.token}));
   function handleOrder() {
     axios.post(`http://127.0.0.1:8000/api/orders`, {
       cart_ids:cartItems.map((item) => item.id),
     }, {
       headers: {
-        Authorization: `Bearer ${Cookies.get('token_cua_Ngoc')}`
+        Authorization: `Bearer ${token}`
       }
     })
       .then(res => {
@@ -89,6 +94,7 @@ export const Cart: React.FC<Props> = ({ onBack }) => {
 
   const [cartItems, setCartItems] = useState<CartItem[]>([
   ]);
+
   function getCart() {
     const token = Cookies.get('token_cua_Ngoc') || "";
     axios.get(`http://127.0.0.1:8000/api/carts`,
@@ -102,7 +108,9 @@ export const Cart: React.FC<Props> = ({ onBack }) => {
       .then((res) => {
         if (res.data.status === 200) {
           setCartItems(res.data.data)
+              dispatch(setCount(res.data.data.length))
         }
+        
         console.log(res.data.data)
       })
       .catch((error) => {

@@ -13,7 +13,7 @@ import { Sorting } from "@/components/sorting";
 import exp from "constants";
 import { useDispatch, useSelector } from "react-redux";
 import { setIsLogin, setToken, setUser } from "@/store/slices/authSlice";
-import { setDataProduct, setLoading, setTotal, Total } from "@/store/slices/productsSlice";
+import { setCount, setDataProduct, setLoading, setSearch, setTotal, Total } from "@/store/slices/productsSlice";
 import LoadingScreen from "./Loading";
 
 
@@ -28,10 +28,11 @@ export default function Shop() {
     const [register, setRegister] = useState({ name: "", email: "", password: "" });
     const [login, setLogin] = useState({ email: "", password: "", role: "Customer" });
     const dispatch = useDispatch();
-    const { total, isLoading, dataProduct }: { total: Total; isLoading: boolean; dataProduct: any } = useSelector((state: any) => ({
+    const { total, isLoading, dataProduct,search }: { total: Total; isLoading: boolean; dataProduct: any,search:string } = useSelector((state: any) => ({
         total: state.product.totalProduct,
         isLoading: state.product.isLoading,
-        dataProduct: state.product.dataProduct
+        dataProduct: state.product.dataProduct,
+        search:state.product.search
     }));
 
     function openModelHandler(element: boolean) {
@@ -48,7 +49,7 @@ export default function Shop() {
             dispatch(setDataProduct([]));
             dispatch(setLoading(true));
             axios
-                .get("http://127.0.0.1:8000/api/products", { params: { page: pageIndex || total.pageIndex, page_size: total.pageSize, id_category: id_category, sort_order: sortOder, sort_col } })
+                .get("http://127.0.0.1:8000/api/products", { params: { page: pageIndex || total.pageIndex, page_size: total.pageSize, id_category: id_category, sort_order: sortOder, sort_col,name:search } })
                 .then((res) => {
                     if (res.data.status === 200) {
                         dispatch(setTotal({ ...total, pageIndex: pageIndex || total.pageIndex, totalPage: res.data.data.total_pages, totalProduct: res.data.data.total_items }));
@@ -113,7 +114,29 @@ export default function Shop() {
             });
 
     };
+    function getCart() {
+        const token = Cookies.get('token_cua_Ngoc') || "";
+        axios.get(`http://127.0.0.1:8000/api/carts`,
+          {
+            params: { page: 1, page_size: 100 },
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        )
+          .then((res) => {
+            if (res.data.status === 200) {
+              dispatch(setCount(res.data.data.length))
+            }
+            console.log(res.data.data)
+          })
+          .catch((error) => {
+            console.log(error);
+          })
+    
+      };
     const handleLogin = async () => {
+
         try {
             dispatch(setLoading(true));
             openModelHandler(false);
@@ -121,6 +144,7 @@ export default function Shop() {
                 .post("http://127.0.0.1:8000/api/auth/login", { email: login.email, password: login.password, role: "Customer" })
                 .then((res) => {
                     if (res.data.status === 200) {
+                        getCart()
                         const access_token = res.data.data["access_token"];
                         const user = res.data.data;
                         dispatch(setUser(user)), dispatch(setIsLogin(true)), dispatch(setToken(access_token));
@@ -174,7 +198,9 @@ export default function Shop() {
         <>
             <div className="container">
 
-                <HeaderComponent onLogin={() => openModelHandler(true)} onHome={() => {
+                <HeaderComponent onSearch={()=>{
+                    getAllProduct({})
+                }}  onLogin={() => openModelHandler(true)} onHome={() => {
                     dispatch(setLoading(true));
                     setTimeout(() => {
                         getAllProduct({});
@@ -208,7 +234,6 @@ export default function Shop() {
                                                 setSelectCategory(item.id);
                                             }}
                                         >
-
                                             {selectCategory == item.id ? <p className="menu-a">{item.name}</p> : <p className="menu">{item.name}</p>}
                                         </span>
                                     );

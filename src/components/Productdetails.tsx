@@ -3,6 +3,8 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
+import { useDispatch } from "react-redux";
+import { setCount } from "@/store/slices/productsSlice";
 
 interface Props {
   onBack: (product: any) => void
@@ -22,7 +24,30 @@ interface Productdetails {
   discount: number,
   description: string,
 }
+
 export const ProdDetail: React.FC<Props> = ({ onBack, idProduct }) => {
+  const dispatch = useDispatch();
+  function getCart() {
+    const token = Cookies.get('token_cua_Ngoc') || "";
+    axios.get(`http://127.0.0.1:8000/api/carts`,
+      {
+        params: { page: 1, page_size: 100 },
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    )
+      .then((res) => {
+        if (res.data.status === 200) {
+          dispatch(setCount(res.data.data.length))
+        }
+        console.log(res.data.data)
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+
+  };
   const [token, setToken] = useState<string>("");
   const [quantity, setQuantity] = useState(1);
   function plusQuantity() {
@@ -49,7 +74,7 @@ export const ProdDetail: React.FC<Props> = ({ onBack, idProduct }) => {
     "updated_at": "2025-03-01 13:39:24",
     "category_id": 1
   });
-  function addCart() {
+  function addCart(type: string) {
     axios.post(`http://127.0.0.1:8000/api/carts`, { product_id: idProduct, quantity: quantity }
       , {
         headers: {
@@ -60,8 +85,12 @@ export const ProdDetail: React.FC<Props> = ({ onBack, idProduct }) => {
       .then(res => {
         console.log(res.data);
         if (res.data.status === 200) {
-          router.push("/cart");
-          alert("Thêm vào giỏ hàng thành công");
+          if(type === "buy"){
+            router.push("/cart");
+          }else{
+          alert("Thêm vào giỏ hàng thành công");            
+          }
+          getCart();
         } else {
           alert("Thêm vào giỏ hàng thất bại");
         }
@@ -120,11 +149,9 @@ export const ProdDetail: React.FC<Props> = ({ onBack, idProduct }) => {
               <span onClick={() => plusQuantity()} className="quantity-btn btn-two">+</span>
             </div>
             <div className="button-detail">
-              <button className="buy-now">Mua Ngay</button>
-              <button className="add-to-cart" onClick={addCart}><i className="fa-solid fa-cart-shopping"></i> Thêm Vào Giỏ</button>
+              <button className="buy-now" onClick={() => addCart("buy")}>Mua Ngay</button>
+              <button className="add-to-cart" onClick={() => addCart("cart")}><i className="fa-solid fa-cart-shopping"></i> Thêm Vào Giỏ</button>
             </div>
-
-
             {/* Thông tin sản phẩm */}
             <div className="product-info">
               <h3>Thông Tin</h3>

@@ -2,16 +2,19 @@ import { useRouter } from "next/router";
 import "@/styles/reponsive.css";
 import Cookies from "js-cookie";
 
-import { use, useEffect, useState } from "react";
+import { ChangeEventHandler, use, useEffect, useState } from "react";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { setIsLogin, setToken, setUser } from "@/store/slices/authSlice";
-export default function HeaderComponent({ onLogin, onRegister, fullName, onHome, isHome }: { onLogin?: any; onRegister?: any; fullName?: string; onHome?: () => void; isHome?: boolean }) {
+import { Value } from "sass";
+import { setCount, setSearch } from "@/store/slices/productsSlice";
+export default function HeaderComponent({ onLogin, onRegister, fullName, onHome, isHome, onSearch }: { onLogin?: any; onRegister?: any; fullName?: string; onHome?: () => void; isHome?: boolean; onSearch?: () => void }) {
     const router = useRouter();
-    const {isLogin, user, token } = useSelector((state:any)=>({
+    const {isLogin, user, token,count } = useSelector((state:any)=>({
         isLogin : state.auth.isLogin,
         user : state.auth.user,
-        token : state.auth.token
+        token : state.auth.token,
+        count : state.product.count
     }))
     const dispatch = useDispatch();
 
@@ -40,7 +43,9 @@ export default function HeaderComponent({ onLogin, onRegister, fullName, onHome,
                 )
                 .then((response) => {
                     console.log(response.status);
+                    
                     if (response.status === 204) {
+                        dispatch(setCount(0));
                         dispatch(setIsLogin(false));
                         dispatch(setUser({}));
                         dispatch(setToken(""));
@@ -170,7 +175,9 @@ export default function HeaderComponent({ onLogin, onRegister, fullName, onHome,
                         <input type="checkbox" hidden id="mobile-search-checkbox" className="header-search-checkbox " />
                         <div className="header-search">
                             <div className="header-search-input-wrap">
-                                <input type="text" className="header-search-input" placeholder="Nhập để tìm kiếm sản phẩm" />
+                                <input type="text" className="header-search-input" placeholder="Nhập để tìm kiếm sản phẩm"  onChange={(e)=>{
+                                    dispatch(setSearch(e.target.value));
+                                }}/>
                                 {/* search history */}
                                 <div className="header-search-history">
                                     <h3 className="header-search-history-heading">Lịch sử tìm kiếm</h3>
@@ -210,12 +217,12 @@ export default function HeaderComponent({ onLogin, onRegister, fullName, onHome,
                                 </ul>
                             </div>
                             <button className="header-search-btn">
-                                <i className="header-search-btn-icon fa-solid fa-magnifying-glass"></i>
+                                <i className="header-search-btn-icon fa-solid fa-magnifying-glass" onClick={onSearch}></i>
                             </button>
                         </div>
                         <div className="header-cart">
                             <i className="header-cart-icon fa-solid fa-cart-shopping header-cart-wrap" onClick={() => router.push("/cart")}>
-                                <p className="header-cart-quantity">3</p>
+                               {count>0 &&  <p className="header-cart-quantity" >{count}</p>}
                             </i>
                             
                         </div>

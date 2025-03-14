@@ -3,6 +3,16 @@ import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
 export default function Invoice() {
     const [bill,setBill] = useState([]);
+    function getOderById(id:any) {
+      axios.get(`http://127.0.0.1:8000/api/orders/${id}`, {
+        headers: {
+          Authorization: `Bearer ${Cookies.get('token_cua_Ngoc')}`
+        }
+      })
+      .then(res => {
+        console.log(res.data);
+      })
+    }
     function getAllOrder() {
         axios.get(`http://127.0.0.1:8000/api/orders`, {
           headers: {
@@ -13,6 +23,7 @@ export default function Invoice() {
             console.log(res.data);
             if (res.data.status === 200 || res.data.status === 201) {
                 setBill(res.data.data);
+                getOderById(res.data.data[0].id)
             } else {
                 alert("Lấy danh sách thất bại");
             }
