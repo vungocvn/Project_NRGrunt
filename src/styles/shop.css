@@ -240,6 +240,7 @@
 }
 .container .header-with-search .header-logo {
   width: 200px;
+  cursor: pointer;
 }
 .container .header-with-search .header-logo-img {
   width: 200px;
