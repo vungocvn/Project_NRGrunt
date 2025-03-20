@@ -82,7 +82,7 @@ const renderItem = (title:any,price:any,image:any,onclick?:()=>void, discount?: 
 
             <div className="favourite"> <i className="fa-solid fa-check"></i> Yêu thích</div>
             <div className="sale">
-                <div className="sale-one">{discount}%</div>
+                <div className="sale-one">{discount*100}%</div>
                 <div className="sale-two">GIẢM</div>
             </div>
 
@@ -97,7 +97,7 @@ const renderItem = (title:any,price:any,image:any,onclick?:()=>void, discount?: 
                     <div className="price-one">{formatVND(price)}</div>
                 </div>
                 <div className="price-cover">
-                    <div className="price-three">{formatVND(price-(price*(discount/100)))}</div>
+                    <div className="price-three">{formatVND(price-(price*discount))}</div>
                 </div>
             </div>
             <div className="content-icon-cover">

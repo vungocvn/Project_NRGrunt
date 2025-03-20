@@ -120,9 +120,7 @@ export const ProdDetail: React.FC<Props> = ({ onBack, idProduct }) => {
     return formatter.toLocaleString("vi-VN", { style: "currency", currency: "VND" });
   }
   return (
-
     <>
-
       <div className="product-container">
         <i className="icon-back fa-solid fa-arrow-left" onClick={onBack}></i>
         {/* Ảnh sản phẩm */}
@@ -140,8 +138,8 @@ export const ProdDetail: React.FC<Props> = ({ onBack, idProduct }) => {
             </p>
             <p>
               <strong>Giá:</strong>{" "}
-              <span className="discount-price">{formatVND(product?.price-(product?.price * (product?.discount / 100)))}</span>{" "}
-              <del className="original-price">{formatVND(product?.price)}</del> ({product?.discount}%)
+              <span className="discount-price">{formatVND(product?.price-(product?.price * (product?.discount)))}</span>{" "}
+              <del className="original-price">{formatVND(product?.price)}</del> ({product?.discount*100}%)
             </p>
             <div className="quantity-cell-border" style={{ width: 80, textAlign: "center" }}>
               <span onClick={() => minusQuantity()} className="quantity-btn btn-one ">-</span>
@@ -153,25 +151,14 @@ export const ProdDetail: React.FC<Props> = ({ onBack, idProduct }) => {
               <button className="add-to-cart" onClick={() => addCart("cart")}><i className="fa-solid fa-cart-shopping"></i> Thêm Vào Giỏ</button>
             </div>
             {/* Thông tin sản phẩm */}
-            <div className="product-info">
-              <h3>Thông Tin</h3>
-              <p>
-                {product?.description}
-              </p>
-              {/* <h3>Thông Số</h3>
-            <ul>
-              <li>Trọng lượng: 300g</li>
-              <li>Thành phần: Tinh dầu thiên nhiên</li>
-              <li>Hạn sử dụng: 3 năm</li>
-            </ul>
-            <h3>Thành Phần</h3>
-            <p>Chiết xuất từ Hoa Sen, Sữa Acacia, Dầu hạnh nhân, Vitamin E.</p>
-            <h3>Cách Dùng</h3> */}
-              {/* <p>Thoa đều lên da sau khi tắm, massage nhẹ nhàng để sản phẩm thẩm thấu.</p> */}
-            </div>
+           
           </div>
         </div>
-
+        <div className="product-info">
+              <h3>Thông Tin</h3>
+             <div className="desc" dangerouslySetInnerHTML={{ __html: product?.description }}></div>
+            
+            </div>
       </div>
     </>
   );
