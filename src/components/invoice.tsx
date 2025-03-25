@@ -9,7 +9,7 @@ export default function Invoice() {
     try {
       const res = await axios.get(`http://127.0.0.1:8000/api/detail-orders/?order_id=${id}`, {
         headers: {
-          Authorization: `Bearer ${Cookies.get("token_cua_Ngoc")}`
+          Authorization: `Bearer ${Cookies.get("token_portal")}`
         }
       });
 
@@ -27,7 +27,7 @@ export default function Invoice() {
     try {
       const res = await axios.get("http://127.0.0.1:8000/api/orders", {
         headers: {
-          Authorization: `Bearer ${Cookies.get("token_cua_Ngoc")}`
+          Authorization: `Bearer ${Cookies.get("token_portal")}`
         }
       });
 

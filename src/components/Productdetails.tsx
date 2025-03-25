@@ -28,7 +28,7 @@ interface Productdetails {
 export const ProdDetail: React.FC<Props> = ({ onBack, idProduct }) => {
   const dispatch = useDispatch();
   function getCart() {
-    const token = Cookies.get('token_cua_Ngoc') || "";
+    const token = Cookies.get('token_portal') || "";
     axios.get(`http://127.0.0.1:8000/api/carts`,
       {
         params: { page: 1, page_size: 100 },
@@ -99,7 +99,7 @@ export const ProdDetail: React.FC<Props> = ({ onBack, idProduct }) => {
     console.log("access_token", token);
   }
   useEffect(() => {
-    const token = Cookies.get('token_cua_Ngoc') || "";
+    const token = Cookies.get('token_portal') || "";
     if (token) {
       setToken(token);
     }
