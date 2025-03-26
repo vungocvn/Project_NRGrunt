@@ -31,7 +31,7 @@ export default function Invoice() {
         }
       });
 
-      if (res.data.status === 200 || res.data.status === 201) {
+      if (res.data.status === 200) {
         const orders = res.data.data || [];
 
         const ordersWithDetails = await Promise.all(
@@ -83,7 +83,7 @@ export default function Invoice() {
               item.details.map((detail: any) => (
                 <tr key={detail.id}>
                   <td className="cart-table-cell">
-                    <img src={detail.image} alt={detail.product_name} className="product-image" />
+                    <img src={`http://127.0.0.1:8000${detail.image}`} alt={detail.product_name} className="product-image" />
                   </td>
                   <td className="cart-table-cell">{detail.product_name}</td>
                   <td className="cart-table-cell">{formatVND(parseFloat(detail.price))}</td>

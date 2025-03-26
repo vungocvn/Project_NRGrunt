@@ -15,6 +15,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setIsLogin, setToken, setUser } from "@/store/slices/authSlice";
 import { setCount, setDataProduct, setLoading, setSearch, setTotal, Total } from "@/store/slices/productsSlice";
 import LoadingScreen from "./Loading";
+import Footer from "@/components/footer";
 
 
 export default function Shop() {
@@ -295,7 +296,7 @@ export default function Shop() {
                         )}
                     </div>
                 </div>
-                <div className="footer">
+                {/* <div className="footer">
                     <div className="gird">
                         <div className="gird-row">
                             <div className="gird-column-2-4">
@@ -395,7 +396,8 @@ export default function Shop() {
                     <div className="gird-row-below">
                         <p className="footer-text">© 2025 - Bản quyền thuộc về công ty Ngọc Vũ</p>
                     </div>
-                </div>
+                </div> */}
+                <Footer/>
             </div>
 
             {/* form login */}

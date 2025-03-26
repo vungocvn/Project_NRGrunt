@@ -170,7 +170,7 @@ export const Cart: React.FC<Props> = ({ onBack }) => {
             {cartItems.map((item) => (
               <tr key={item.id}>
                 <td className="cart-table-cell">
-                  <img src={item.image} alt={item.product_name} className="product-image" />
+                  <img src={`http://127.0.0.1:8000${item.image}`} alt={item.product_name} className="product-image" />
                 </td>
                 <td className="cart-table-cell">{item.product_name}</td>
                 <td className="cart-table-cell">{formatVND(parseFloat(item.price))}</td>

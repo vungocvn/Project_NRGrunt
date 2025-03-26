@@ -1,130 +1,118 @@
-
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import "@/styles/product.css";
-import { on } from 'events';
-import { pages } from 'next/dist/build/templates/app-page';
+import { useRouter } from 'next/router';
+
 interface Props {
-    onSelectProduct: (product: any) => void
-    listProduct: [], 
-    category: []
+    onSelectProduct: (product: any) => void;
+    listProduct: any[];
+    category: any[];
 }
 
-export const ProdList: React.FC<Props> = ({onSelectProduct,listProduct,category}) =>  {
-     const [lstProduct, setLstProduct] = useState([])
+interface Productlist {
+    id: number;
+    name: string;
+    status: number;
+    price: number;
+    image: string;
+    created_at: string;
+    updated_at: string;
+    category_id: number;
+    quantity: number;
+    origin: string;
+    discount: number;
+    description: string;
+}
+
+export const ProdList: React.FC<Props> = ({ onSelectProduct, listProduct, category }) => {
+    const [lstProduct, setLstProduct] = useState<Productlist[]>([]);
+    const router = useRouter();
 
     useEffect(() => {
-        setLstProduct(listProduct)
-        // getAllProduct()
-    }, [listProduct])
+        setLstProduct(listProduct);
+    }, [listProduct]);
+
     return (
-    <>
-      
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 p-6 body-content-nav">
-          {lstProduct.map((item) => renderItem(item['name'],item['price'],item['image'],()=>{onSelectProduct(item)},
-          item['discount'], item['quantity'], item['origin'], item['category_id'], category))}
-          
-            
-        </div>
-        {/* <ul className="pagination home-product-pagination">
-                <li className="pagination-item">
-                    <a href="" className="pagination-link">
-                        <i className="pagination-icon fa-solid fa-angle-left"></i>
-                    </a>
-                </li>
-                <li className="pagination-item pagination-active">
-                    <a href="" className="pagination-link">1 </a>
-                </li>
-                <li className="pagination-item">
-                    <a href="" className="pagination-link">2 </a>
-                </li>
-                <li className="pagination-item">
-                    <a href="" className="pagination-link">3 </a>
-                </li>
-                <li className="pagination-item">
-                    <a href="" className="pagination-link">4 </a>
-                </li>
-                <li className="pagination-item">
-                    <a href="" className="pagination-link">5 </a>
-                </li>
-                <li className="pagination-item">
-                    <a href="" className="pagination-link">... </a>
-                </li>
-                <li className="pagination-item">
-                    <a href="" className="pagination-link">14 </a>
-                </li>
-                <li className="pagination-item">
-                    <a href="" className="pagination-link">
-                        <i className="pagination-icon fa-solid fa-angle-right"></i>
-                    </a>
-                </li>
-            </ul> */}
-    </>
-  );
-}
+        <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 p-6 body-content-nav">
+                {lstProduct.map((item) => renderItem(item, onSelectProduct, category))}
+            </div>
+        </>
+    );
+};
 
-export default ProdList
-const renderItem = (title:any,price:any,image:any,onclick?:()=>void, discount?: any,
- quantity?: any, origin?: any,category_id?: number, category?: []) => {
-    let category_item = category?.length!=undefined? category.filter((item:any) => item['id'] == category_id)[0]:null;
-    let category_name = category_item !=null? category_item['name']:'';
-    function formatVND(amount:any) {
-        var formatter = parseFloat(amount);
-        return formatter.toLocaleString("vi-VN", { style: "currency", currency: "VND" });
+export default ProdList;
+
+const renderItem = (
+    item: Productlist,
+    onSelectProduct: (product: any) => void,
+    category: any[]
+) => {
+    const categoryItem = category.find((itemCategory: any) => itemCategory.id === item.category_id);
+    const categoryName = categoryItem ? categoryItem.name : '';
+
+    function formatVND(amount: any) {
+        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
     }
-    return(
-        <div className="content-cover-nav-one" onClick={onclick}>
-        <div className="content-cover-sub">
-            <div className="content-cover-image">
-                {/* <img src="./image/la1.webp" alt="" /> */}
-                <img src={image} alt="" />
-            </div>
 
-            <div className="favourite"> <i className="fa-solid fa-check"></i> Yêu thích</div>
-            <div className="sale">
-                <div className="sale-one">{discount*100}%</div>
-                <div className="sale-two">GIẢM</div>
-            </div>
-
-        </div>
-        <div className="title-many-cover">
-
-            <div className="content-cover-title">
-                <p>{title} </p>
-            </div>
-            <div className="content-cover-price">
-                <div className="price-cover">
-                    <div className="price-one">{formatVND(price)}</div>
+    return (
+        <div className="content-cover-nav-one" onClick={() => onSelectProduct(item)}>
+            <div className="content-cover-sub">
+                <div className="content-cover-image">
+                    {/* Sửa lại đường dẫn ảnh */}
+                    <img src={`http://127.0.0.1:8000${item.image}`} alt={item.name} />
                 </div>
-                <div className="price-cover">
-                    <div className="price-three">{formatVND(price-(price*discount))}</div>
+                <div className="favourite">
+                    <i className="fa-solid fa-check"></i> Yêu thích
+                </div>
+                <div className="sale">
+                    <div className="sale-one">{item.discount * 100}%</div>
+                    <div className="sale-two">GIẢM</div>
                 </div>
             </div>
-            <div className="content-icon-cover">
-                <div className="content-icon-one">
-                    <i className="fa-solid fa-heart"></i>
+            <div className="title-many-cover">
+                <div className="content-cover-title">
+                    <p>{item.name}</p>
                 </div>
-                <div className="cover">
-                    <div className="content-icon-star">
-                        <div className="start-one">
-                            <i className="fa-solid fa-star"></i></div>
-                        <div className="start-one">
-                            <i className="fa-solid fa-star"></i></div>
-                        <div className="start-one">
-                            <i className="fa-solid fa-star"></i></div>
-                        <div className="start-one">
-                            <i className="fa-solid fa-star"></i></div>
-                        <div className="start-on">
-                            <i className="fa-solid fa-star"></i></div>
+                <div className="content-cover-price">
+                    <div className="price-cover">
+                        <div className="price-one">{formatVND(item.price)}</div>
                     </div>
-                    <div className="buy">Đã bán {quantity}</div>
+                    <div className="price-cover">
+                        <div className="price-three">{formatVND(item.price - item.price * item.discount)}</div>
+                    </div>
+                </div>
+                <div className="content-icon-cover">
+                    <div className="content-icon-one">
+                        <i className="fa-solid fa-heart"></i>
+                    </div>
+                    <div className="cover">
+                        <div className="content-icon-star">
+                            <div className="start-one">
+                                <i className="fa-solid fa-star"></i>
+                            </div>
+                            <div className="start-one">
+                                <i className="fa-solid fa-star"></i>
+                            </div>
+                            <div className="start-one">
+                                <i className="fa-solid fa-star"></i>
+                            </div>
+                            <div className="start-one">
+                                <i className="fa-solid fa-star"></i>
+                            </div>
+                            <div className="start-on">
+                                <i className="fa-solid fa-star"></i>
+                            </div>
+                        </div>
+                        <div className="buy">Đã bán {item.quantity}</div>
+                    </div>
+                </div>
+                <div className="content-below">
+                    <div className="below-left">{categoryName}</div>
+                    <div className="below-right">
+                        <i className="fa-solid fa-location-dot"></i>{item.origin}
+                    </div>
                 </div>
             </div>
-            <div className="content-below">
-                <div className="below-left">{category_name}</div>
-                <div className="below-right"><i className="fa-solid fa-location-dot"></i>{origin}</div>
-            </div>
         </div>
-    </div>
-    )
-}
+    );
+};

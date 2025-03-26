@@ -65,7 +65,7 @@ export const ProdDetail: React.FC<Props> = ({ onBack, idProduct }) => {
     "name": "tivi",
     "status": 1,
     "price": 12000,
-    "image": "./public/images/electronics.jpg",
+    "image": "storage/images/ottpJefChM.jpg",
     "quantity": 100,
     "origin": "Việt Nam",
     "discount": 0,
@@ -126,8 +126,7 @@ export const ProdDetail: React.FC<Props> = ({ onBack, idProduct }) => {
         {/* Ảnh sản phẩm */}
         <div className="product-cover">
           <div className="product-gallery">
-            <img src={product?.image} alt="" className="product-image" style={{width:'100%', height:'50%',objectFit:'cover'}} />
-            {/* <img src="./image/svr.jfif" alt="" /> */}
+            <img src={`http://127.0.0.1:8000${product?.image}`} alt="" className="product-image" style={{width:'100%', height:'50%',objectFit:'cover'}} />
           </div>
 
           {/* Thông tin sản phẩm */}
