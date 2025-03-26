@@ -12,6 +12,7 @@
     cursor: pointer;
 }
 .product-cover {
+  margin-top: 6px;
     display: flex;
     flex-direction: row;
     gap: 20px;
@@ -112,8 +113,11 @@
 .add-to-cart:hover {
   background-color: var(--hover-color);
 }
-  
+  .product-info{
+    margin-left: 6px;
+  }
   .product-info h3 {
+    margin-top: 10px;
     font-size: 18px;
     font-weight: bold;
     color: #333;
