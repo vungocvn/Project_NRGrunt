@@ -17,7 +17,6 @@ export default function HeaderComponent({ onLogin, onRegister, fullName, onHome,
         count : state.product.count
     }))
     const dispatch = useDispatch();
-
     const handleBack = () => {
         if (window.history.length > 1) {
             router.back();
@@ -144,7 +143,7 @@ export default function HeaderComponent({ onLogin, onRegister, fullName, onHome,
                                     <i className="header-navbar-icon fa-regular fa-circle-question"></i>
                                     Trợ giúp
                                 </li>
-                                {isLogin ? (
+                                {isLogin && token !='' ? (
                                     <>
                                         <li className="header-cover-li-a header-cover-li-strong" style={{ marginRight: 8 }}>
                                             Xin chào { user ? user?.email : ''}

@@ -4,7 +4,9 @@ export default function Category() {
     return (
         <div className="container">
              <HeaderComponent />   
-            <Cart />
+            <Cart onBack={function(product: any): void {
+                throw new Error("Function not implemented.");
+            } } />
         </div>
     )
 }

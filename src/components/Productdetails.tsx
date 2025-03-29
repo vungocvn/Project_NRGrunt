@@ -122,7 +122,7 @@ export const ProdDetail: React.FC<Props> = ({ onBack, idProduct }) => {
   return (
     <>
       <div className="product-container">
-        <i className="icon-back fa-solid fa-arrow-left" onClick={onBack}></i>
+        {/*<i className="icon-back fa-solid fa-arrow-left" onClick={onBack}></i>*/}
         {/* Ảnh sản phẩm */}
         <div className="product-cover">
           <div className="product-gallery">

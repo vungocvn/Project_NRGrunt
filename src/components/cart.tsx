@@ -36,6 +36,7 @@ export const Cart: React.FC<Props> = ({ onBack }) => {
   const {token} = useSelector((state:any)=>({
     token : state.auth.token}));
   function handleOrder() {
+    // router.push(`/OrderDetails`);
     axios.post(`http://127.0.0.1:8000/api/orders`, {
       cart_ids:cartItems.map((item) => item.id),
     }, {
