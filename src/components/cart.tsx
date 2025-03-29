@@ -60,7 +60,7 @@ export const Cart: React.FC<Props> = ({ onBack }) => {
     axios.put(`http://127.0.0.1:8000/api/carts/${cart_id}`, { product_id: product_id, quantity: quantity }
       , {
         headers: {
-          Authorization: `Bearer ${Cookies.get('token_cua_Ngoc')}`
+          Authorization: `Bearer ${Cookies.get('token_portal')}`
         }
       }
     )
@@ -78,7 +78,7 @@ export const Cart: React.FC<Props> = ({ onBack }) => {
     axios.delete(`http://127.0.0.1:8000/api/carts/${cart_id}`,
       {
         headers: {
-          Authorization: `Bearer ${Cookies.get('token_cua_Ngoc')}`
+          Authorization: `Bearer ${Cookies.get('token_portal')}`
         }
       }
     )
@@ -97,7 +97,7 @@ export const Cart: React.FC<Props> = ({ onBack }) => {
   ]);
 
   function getCart() {
-    const token = Cookies.get('token_cua_Ngoc') || "";
+    const token = Cookies.get('token_portal') || "";
     axios.get(`http://127.0.0.1:8000/api/carts`,
       {
         params: { page: 1, page_size: 100 },
@@ -171,7 +171,7 @@ export const Cart: React.FC<Props> = ({ onBack }) => {
             {cartItems.map((item) => (
               <tr key={item.id}>
                 <td className="cart-table-cell">
-                  <img src={item.image} alt={item.product_name} className="product-image" />
+                  <img src={`http://127.0.0.1:8000${item.image}`} alt={item.product_name} className="product-image" />
                 </td>
                 <td className="cart-table-cell">{item.product_name}</td>
                 <td className="cart-table-cell">{formatVND(parseFloat(item.price))}</td>

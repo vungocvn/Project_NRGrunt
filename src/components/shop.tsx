@@ -15,8 +15,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { setIsLogin, setToken, setUser } from "@/store/slices/authSlice";
 import { setCount, setDataProduct, setLoading, setSearch, setTotal, Total } from "@/store/slices/productsSlice";
 import LoadingScreen from "./Loading";
-import {FooterComponents} from "@/components/FooterComponents";
-
 
 export default function Shop() {
     const [selectedProd, setSelectedProd] = useState(null);
@@ -103,7 +101,7 @@ export default function Shop() {
             .then((res) => {
                 if (res.data.status === 201) {
                     const access_token = res.data.token;
-                    Cookies.set("token_cua_Ngoc", access_token, { expires: 1 });
+                    Cookies.set("token_portal", access_token, { expires: 1 });
                     alert("Sign up successfully!");
                     setSelectAuth(true);
                     setLogin({ ...login, email: register.email, password: register.password });
@@ -117,6 +115,7 @@ export default function Shop() {
 
     };
     function getCart() {
+        const token = Cookies.get('token_portal') || "";
         axios.get(`http://127.0.0.1:8000/api/carts`,
           {
             params: { page: 1, page_size: 100 },
@@ -149,7 +148,7 @@ export default function Shop() {
                         const access_token = res.data.data["access_token"];
                         const user = res.data.data;
                         dispatch(setUser(user)), dispatch(setIsLogin(true)), dispatch(setToken(access_token));
-                        Cookies.set("token_cua_Ngoc", access_token, { expires: 1 });
+                        Cookies.set("token_portal", access_token, { expires: 1 });
                         alert("Đăng nhập thành công!");
                         // setUser(login.email)
                         openModelHandler(true);
@@ -172,6 +171,8 @@ export default function Shop() {
 
 
     useEffect(() => {
+        const token = Cookies.get("token_portal") || "";
+
         if (token && token !== "") {
             axios
                 .post(

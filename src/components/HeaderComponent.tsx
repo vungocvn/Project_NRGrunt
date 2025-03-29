@@ -48,7 +48,7 @@ export default function HeaderComponent({ onLogin, onRegister, fullName, onHome,
                         dispatch(setIsLogin(false));
                         dispatch(setUser({}));
                         dispatch(setToken(""));
-                        Cookies.remove("token_cua_Ngoc");
+                        Cookies.remove("token_portal");
                         router.push("/shop");
                         alert("Đăng xuất thành công");
                     }
