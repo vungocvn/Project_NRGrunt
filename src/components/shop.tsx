@@ -45,30 +45,49 @@ export default function Shop() {
     }
 
     function getAllProduct({ id_category, sortOder, sort_col, pageIndex }: { id_category?: number; sortOder?: string; sort_col?: string; pageIndex?: number }) {
+        const currentPage = pageIndex || total.pageIndex;
+    
+        dispatch(setDataProduct([]));
+        dispatch(setLoading(true));
+    
         try {
-            dispatch(setDataProduct([]));
-            dispatch(setLoading(true));
             axios
-                .get("http://127.0.0.1:8000/api/products", { params: { page: pageIndex || total.pageIndex, page_size: total.pageSize, id_category: id_category, sort_order: sortOder, sort_col,name:search } })
+                .get("http://127.0.0.1:8000/api/products", {
+                    params: {
+                        page_index: currentPage,   
+                        page_size: total.pageSize,
+                        id_category,
+                        sort_order: sortOder,
+                        sort_col,
+                        name: search
+                    }
+                })
                 .then((res) => {
                     if (res.data.status === 200) {
-                        dispatch(setTotal({ ...total, pageIndex: pageIndex || total.pageIndex, totalPage: res.data.data.total_pages, totalProduct: res.data.data.total_items }));
+                        dispatch(setTotal({
+                            ...total,
+                            pageIndex: currentPage,
+                            totalPage: res.data.data.total_pages,
+                            totalProduct: res.data.data.total_items
+                        }));
                         dispatch(setDataProduct(res.data.data.items));
                     } else {
-                        alert("Sign up error, please try again!");
+                        alert("Không thể tải sản phẩm. Vui lòng thử lại!");
                     }
-                    dispatch(setLoading(false));
                 })
                 .catch((error) => {
-                    alert("Sign up error, please try again!");
+                    console.error("Lỗi khi gọi API:", error);
+                    alert("Lỗi khi gọi API sản phẩm!");
+                })
+                .finally(() => {
+                    dispatch(setLoading(false));
                 });
         } catch (e) {
-            console.log(e);
-        } finally {
+            console.log("Lỗi hệ thống:", e);
             dispatch(setLoading(false));
         }
-
     }
+    
     function getAllCategory() {
         axios
             .get("http://127.0.0.1:8000/api/categories")
@@ -135,6 +154,7 @@ export default function Shop() {
           })
     
       };
+      
     const handleLogin = async () => {
 
         try {
@@ -193,14 +213,20 @@ export default function Shop() {
 
         }
     }, [router]);
-
+    const handleSearch = () => {
+        getAllProduct({ pageIndex: 1 });
+        dispatch(setSearch(""));
+    };
     return (
         <>
             <div className="container">
-
-                <HeaderComponent onSearch={()=>{
-                    getAllProduct({})
-                }}  onLogin={() => openModelHandler(true)} onHome={() => {
+                <HeaderComponent
+                search={search}
+                 onSearch={()=>{
+                    getAllProduct({pageIndex:1})
+                    dispatch(setSearch(""));
+                }}
+                  onLogin={() => openModelHandler(true)} onHome={() => {
                     dispatch(setLoading(true));
                     setTimeout(() => {
                         getAllProduct({});
@@ -243,60 +269,58 @@ export default function Shop() {
                     </div>}
 
                     <div className="body-container-content">
+  {selectedProd == null ? (
+    <>
+      <div className="Sorting">
+        <Sorting
+          onNew={() =>
+            getAllProduct({ sortOder: "desc", sort_col: "created_at", pageIndex: 1 })
+          }
+          onSortPrice={(value) =>
+            getAllProduct({ sortOder: value.target.value, sort_col: "price", pageIndex: 1 })
+          }
+          onTrending={() =>
+            getAllProduct({ sortOder: "desc", sort_col: "discount", pageIndex: 1 })
+          }
 
-                        {selectedProd == null ? (
-                            <>
-                                <div className="Sorting">
-                                    <Sorting
-                                        onNew={() => getAllProduct({ sortOder: "desc", sort_col: "created_at" })}
-                                        onSortPrice={(value) => getAllProduct({ sortOder: value.target.value, sort_col: "price" })}
-                                        onTrending={() => getAllProduct({ sortOder: "desc", sort_col: "discount" })}
+          page={`${total.pageIndex}/${total.totalPage}`}
 
-                                        page={`${total.pageIndex}/${total.totalPage}`}
-                                        onNextPage={() => {
-                                            if (total.pageIndex < total.totalPage) {
-                                                dispatch(setLoading(true));
-                                                const newPageIndex = total.pageIndex + 1;
-                                                dispatch(setTotal({ ...total, pageIndex: newPageIndex }));
-                                                setTimeout(() => {
-                                                    getAllProduct({ id_category: selectCategory ?? undefined, pageIndex: newPageIndex });
-                                                }, 1500);
-                                            }
-                                        }}
-                                        onPrevPage={() => {
-                                            if (total.pageIndex > 1) {
-                                                dispatch(setLoading(true));
-                                                const newPageIndex = total.pageIndex - 1;
-                                                dispatch(setTotal({ ...total, pageIndex: newPageIndex }));
-                                                setTimeout(() => {
-                                                    getAllProduct({ id_category: selectCategory ?? undefined, pageIndex: newPageIndex });
-                                                }, 1500);
-                                            }
-                                        }}
+          onNextPage={() => {
+            if (total.pageIndex < total.totalPage) {
+              const newPageIndex = total.pageIndex + 1;
+              getAllProduct({ id_category: selectCategory ?? undefined, pageIndex: newPageIndex });
+            }
+          }}
 
-                                    />
-                                </div>
+          onPrevPage={() => {
+            if (total.pageIndex > 1) {
+              const newPageIndex = total.pageIndex - 1;
+              getAllProduct({ id_category: selectCategory ?? undefined, pageIndex: newPageIndex });
+            }
+          }}
+        />
+      </div>
 
-                                <div className="banner-image w-270 h-50" style={{ marginTop: "20px", marginBottom: "20px" }}><Banner /></div>
-                                {
-                                    dataProduct.length > 0 && (
-                                        <ProdList
-                                            onSelectProduct={(e) => {
-                                                setSelectedProd(e);
-                                            }}
-                                            listProduct={dataProduct}
+      <div
+        className="banner-image w-270 h-50"
+        style={{ marginTop: "20px", marginBottom: "20px" }}
+      >
+        <Banner />
+      </div>
 
-                                            category={lstCategory}
-                                        />
-                                    )
-                                }
-                            </>
-                        ) : (
+      {dataProduct.length > 0 && (
+        <ProdList
+          onSelectProduct={(e) => setSelectedProd(e)}
+          listProduct={dataProduct}
+          category={lstCategory}
+        />
+      )}
+    </>
+  ) : (
+    <ProdDetail idProduct={selectedProd["id"]} onBack={() => setSelectedProd(null)} />
+  )}
+</div>
 
-                            <ProdDetail idProduct={selectedProd["id"]} onBack={() => setSelectedProd(null)} />
-
-                        )}
-                    </div>
                 </div>
             </div>
 

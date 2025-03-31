@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setIsLogin, setToken, setUser } from "@/store/slices/authSlice";
 import { Value } from "sass";
 import { setCount, setSearch } from "@/store/slices/productsSlice";
-export default function HeaderComponent({ onLogin, onRegister, fullName, onHome, isHome, onSearch }: { onLogin?: any; onRegister?: any; fullName?: string; onHome?: () => void; isHome?: boolean; onSearch?: () => void }) {
+export default function HeaderComponent({ onLogin, onRegister, fullName, onHome, isHome, onSearch, search }: { onLogin?: any; onRegister?: any; fullName?: string; onHome?: () => void; isHome?: boolean; onSearch?: () => void; search?: string; }) {
     const router = useRouter();
     const {isLogin, user, token,count } = useSelector((state:any)=>({
         isLogin : state.auth.isLogin,
@@ -174,9 +174,10 @@ export default function HeaderComponent({ onLogin, onRegister, fullName, onHome,
                         <input type="checkbox" hidden id="mobile-search-checkbox" className="header-search-checkbox " />
                         <div className="header-search">
                             <div className="header-search-input-wrap">
-                                <input type="text" className="header-search-input" placeholder="Nhập để tìm kiếm sản phẩm"  onChange={(e)=>{
+                                <input type="text" className="header-search-input" placeholder="Nhập để tìm kiếm sản phẩm" value={search} onChange={(e)=>{
                                     dispatch(setSearch(e.target.value));
                                 }}/>
+
                                 {/* search history */}
                                 <div className="header-search-history">
                                     <h3 className="header-search-history-heading">Lịch sử tìm kiếm</h3>
