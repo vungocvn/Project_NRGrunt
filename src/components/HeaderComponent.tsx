@@ -11,7 +11,7 @@ import { setCount, setSearch } from "@/store/slices/productsSlice";
 export default function HeaderComponent({ onLogin, onRegister, fullName, onHome, isHome, onSearch, search }: { onLogin?: any; onRegister?: any; fullName?: string; onHome?: () => void; isHome?: boolean; onSearch?: () => void; search?: string; }) {
     const router = useRouter();
     const {isLogin, user, token,count } = useSelector((state:any)=>({
-        isLogin : state.auth.isLogin,
+        isLogin : state.auth.isLogin, // false
         user : state.auth.user,
         token : state.auth.token,
         count : state.product.count
