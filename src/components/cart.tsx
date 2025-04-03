@@ -1,161 +1,172 @@
 import React, { useState, useEffect } from "react";
 import HeaderComponent from './HeaderComponent';
-import '@/styles/shop.css'
+import '@/styles/shop.css';
 import { useRouter } from "next/router";
 import axios from "axios";
-import { get } from "http";
 import Cookies from "js-cookie";
 import { useDispatch, useSelector } from "react-redux";
 import { setCount } from "@/store/slices/productsSlice";
+import CheckoutModal from "@/components/checkAuthModal";
 
 interface Props {
-  onBack: (product: any) => void
+  onBack: (product: any) => void;
+  setNotify?: (msg: string) => void;
 }
+
 interface CartItem {
-  id:number,
-  image: string,
-  price: string,
-  product_id: number,
-  product_name: string
-  quantity: number
-  user_id: number
+  id: number;
+  image: string;
+  price: string;
+  product_id: number;
+  product_name: string;
+  quantity: number;
+  user_id: number;
 }
-export const Cart: React.FC<Props> = ({ onBack }) => {
+
+export const Cart: React.FC<Props> = ({ onBack, setNotify }) => {
   const dispatch = useDispatch();
   const router = useRouter();
-  const [openModel, setOpenModel] = useState(false)
-  const [selectAuth, setSelectAuth] = useState(true)
-  function openModelHandler(element: boolean) {
-    if (!openModel) {
-      setSelectAuth(element)
-      setOpenModel(true)
-    } else {
-      setOpenModel(false)
-    }
-  }
-  const {token} = useSelector((state:any)=>({
-    token : state.auth.token}));
-  function handleOrder() {
-    // router.push(`/OrderDetails`);
-    axios.post(`http://127.0.0.1:8000/api/orders`, {
-      cart_ids:cartItems.map((item) => item.id),
-    }, {
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [shippingFee, setShippingFee] = useState(30000);
+  const [vat, setVat] = useState(0);
+  const [finalTotal, setFinalTotal] = useState(0);
+  const [showModal, setShowModal] = useState(false);
+
+  const { token } = useSelector((state: any) => ({
+    token: state.auth.token
+  }));
+
+  const totalPrice = cartItems.reduce(
+    (sum, item) => sum + parseFloat(item.price) * item.quantity,
+    0
+  );
+
+  useEffect(() => {
+    const vatAmount = totalPrice * 0.05;
+    setVat(vatAmount);
+    setFinalTotal(totalPrice + vatAmount + shippingFee);
+  }, [totalPrice, shippingFee]);
+
+  const getCart = () => {
+    const token = Cookies.get("token_portal") || "";
+    axios.get(`http://127.0.0.1:8000/api/carts`, {
+      params: { page: 1, page_size: 100 },
       headers: {
         Authorization: `Bearer ${token}`
       }
     })
-      .then(res => {
-        console.log(res.data);
-        if (res.data.status === 200 || res.data.status === 201) {
-          alert("Order success");
-          router.push("/invoice");
-        } else {
-          alert("Order fail");
-        }
-      })
-      .catch(error => console.log(error))
-    }
- 
-  function updateCart(cart_id:number,product_id: number, quantity: number) {
-    axios.put(`http://127.0.0.1:8000/api/carts/${cart_id}`, { product_id: product_id, quantity: quantity }
-      , {
-        headers: {
-          Authorization: `Bearer ${Cookies.get('token_portal')}`
-        }
-      }
-    )
-      .then(res => {
-        console.log(res.data);
+      .then((res) => {
         if (res.data.status === 200) {
-          // alert("Cap nhap gio hang thanh cong");
-        } else {
-          alert("Cap nhap gio hang that bai");
+          setCartItems(res.data.data);
+          dispatch(setCount(res.data.data.length));
         }
       })
-      .catch(error => console.log(error))
-  }
-  function deleteCart(cart_id:number) {
-    axios.delete(`http://127.0.0.1:8000/api/carts/${cart_id}`,
+      .catch((error) => console.log(error));
+  };
+
+  const updateCart = (cart_id: number, product_id: number, quantity: number) => {
+    axios.put(`http://127.0.0.1:8000/api/carts/${cart_id}`,
+      { product_id, quantity },
       {
         headers: {
-          Authorization: `Bearer ${Cookies.get('token_portal')}`
+          Authorization: `Bearer ${Cookies.get("token_portal")}`
         }
       }
-    )
+    ).catch(error => console.log(error));
+  };
+
+  const updateQuantity = (id: number, delta: number, quantity: number, product_id: number) => {
+    const newQty = Math.max(1, quantity + delta);
+    setCartItems((prevItems) =>
+      prevItems.map((item) =>
+        item.id === id ? { ...item, quantity: newQty } : item
+      )
+    );
+    updateCart(id, product_id, newQty);
+  };
+
+  const deleteCart = (id: number) => {
+    axios.delete(`http://127.0.0.1:8000/api/carts/${id}`, {
+      headers: {
+        Authorization: `Bearer ${Cookies.get("token_portal")}`
+      }
+    })
       .then(res => {
-        if (res.data.status === 204 || res.data.status === 404 || res.data.status === 200 || res.data.status == undefined) {
+        if ([200, 204, 404].includes(res.data.status) || res.data.status === undefined) {
           getCart();
           alert("Delete cart success");
         } else {
-          alert("Xoa gio hang that bai");
+          alert("Xóa giỏ hàng thất bại");
         }
       })
-      .catch(error => console.log(error))
-    }
-
-  const [cartItems, setCartItems] = useState<CartItem[]>([
-  ]);
-
-  function getCart() {
-    const token = Cookies.get('token_portal') || "";
-    axios.get(`http://127.0.0.1:8000/api/carts`,
-      {
-        params: { page: 1, page_size: 100 },
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-    )
-      .then((res) => {
-        if (res.data.status === 200) {
-          setCartItems(res.data.data)
-              dispatch(setCount(res.data.data.length))
-        }
-        
-        console.log(res.data.data)
-      })
-      .catch((error) => {
-        console.log(error);
-      })
-
+      .catch(error => console.log(error));
   };
+
+  const handleOrder = async (name: string, phone: string, address: string) => {
+    try {
+      const token = Cookies.get("token_portal");
+
+      await axios.put(
+        "http://127.0.0.1:8000/api/users/profile",
+        { name, phone, address },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const payload = {
+        cart_ids: cartItems.map((item) => item.id),
+        total_price: totalPrice,
+        vat: vat,
+        shipping_fee: shippingFee,
+        final_total: finalTotal,
+        phone,
+        address,
+      };
+
+      const res = await axios.post(`http://127.0.0.1:8000/api/orders`, payload, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (res.data.status === 200 || res.data.status === 201) {
+        localStorage.setItem("invoice", JSON.stringify(res.data.data));
+        router.push("/invoice");
+      } else {
+        alert("Đặt hàng thất bại");
+      }
+    } catch (error) {
+      console.error("Lỗi khi đặt hàng:", error);
+      alert("Có lỗi xảy ra khi đặt hàng!");
+    }
+  };
+
   useEffect(() => {
-    const updatedPrices = {};
     getCart();
-    // cartItems.forEach(item => {
-    //   updatedPrices[item.id] = (item.price * item.quantity).toLocaleString('vi-VN');
-    // });
-    // setFormattedPrices(updatedPrices);
   }, []);
 
-
-  const updateQuantity = (id: number, delta:any,quantity:any,idProduct:any) => {
-    setCartItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === id
-          ? { ...item, quantity: Math.max(1, item.quantity + delta) }
-          : item
-      )
-    );
-    updateCart(id,idProduct,Math.max(1, quantity + delta));
-  };
-  console.log(cartItems)
-
-  const removeItem = (id:number) => {
-    setCartItems(cartItems.filter((item) => item.id !== id));
-  };
-
-  const totalPrice = cartItems.reduce((sum, item) => sum + parseFloat(item.price) * item.quantity, 0);
-  const vat = totalPrice - totalPrice * 0.95;
-  const shippingFee = 50000;
-  const finalTotal = totalPrice + vat + shippingFee;
-  function formatVND(amount:any) {
+  const formatVND = (amount: number) => {
     return amount.toLocaleString("vi-VN", { style: "currency", currency: "VND" });
-}
+  };
+
+  const handleCheckoutClick = () => {
+    if (!token) {
+      setNotify?.("Vui lòng đăng nhập để thanh toán");
+      return;
+    }
+    setShowModal(true);
+  };
+
   return (
     <>
       <div className="cart-container container-one">
-        <h2 className="cart-header">Giỏ hàng <i className="cart-header-icon-nav fa-solid fa-bag-shopping"></i></h2>
+        <h2 className="cart-header">
+          Giỏ hàng <i className="cart-header-icon-nav fa-solid fa-bag-shopping"></i>
+        </h2>
+
         <table className="cart-table">
           <thead>
             <tr className="cart-table-header">
@@ -177,31 +188,46 @@ export const Cart: React.FC<Props> = ({ onBack }) => {
                 <td className="cart-table-cell">{formatVND(parseFloat(item.price))}</td>
                 <td className="cart-table-cell quantity-cell">
                   <div className="quantity-cell-border">
-                    <span onClick={() => updateQuantity(item.id, -1,item.quantity,item.product_id)} className="quantity-btn btn-one ">-</span>
+                    <span onClick={() => updateQuantity(item.id, -1, item.quantity, item.product_id)} className="quantity-btn btn-one">-</span>
                     <span className="quantity">{item.quantity}</span>
-                    <span onClick={() => updateQuantity(item.id, 1,item.quantity,item.product_id)} className="quantity-btn btn-two">+</span>
+                    <span onClick={() => updateQuantity(item.id, 1, item.quantity, item.product_id)} className="quantity-btn btn-two">+</span>
                   </div>
                 </td>
-                <td className="cart-table-cell">{formatVND(parseFloat(item.price)*item.quantity)|| "..."}</td>
+                <td className="cart-table-cell">{formatVND(parseFloat(item.price) * item.quantity)}</td>
                 <td className="cart-table-cell">
-                  <div onClick={() => deleteCart(item.id)}><i className="delete-btn fa-solid fa-trash"></i></div>
+                  <div onClick={() => deleteCart(item.id)}>
+                    <i className="delete-btn fa-solid fa-trash"></i>
+                  </div>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
+
         <div className="cart-summary">
-          <p>Tổng giá: {totalPrice.toLocaleString("vi-VN")}₫</p>
-          <p>VAT (5%): {vat.toLocaleString("vi-VN")}₫</p>
-          <p>Shipping: {shippingFee.toLocaleString("vi-VN")}₫</p>
-          <p className="font-bold">Thành tiền: {finalTotal.toLocaleString("vi-VN")}₫</p>
-        </div>
-        <div className="footer-button">
-          <button className="checkout-btn" onClick={handleOrder}>Thanh Toán</button>
+          <p>Tổng giá: {formatVND(totalPrice)}</p>
+          <p>VAT (5%): {formatVND(vat)}</p>
+          <p>Phí vận chuyển: {formatVND(shippingFee)}</p>
+          <p className="font-bold">Thành tiền: {formatVND(finalTotal)}</p>
         </div>
 
+        <div className="footer-button">
+          <button className="checkout-btn" onClick={handleCheckoutClick}>
+            Thanh Toán
+          </button>
+        </div>
       </div>
+
+      {showModal && (
+        <CheckoutModal
+          onClose={() => setShowModal(false)}
+          onSubmit={({ name, phone, address }) => {
+            handleOrder(name, phone, address).then(() => setShowModal(false));
+          }}
+        />
+      )}
     </>
   );
-}
-export default Cart
+};
+
+export default Cart;

@@ -1,9 +1,11 @@
 import axios from "axios";
 import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 
 export default function Invoice() {
-  const [bill, setBill] = useState<any[]>([]);
+  const [bill, setBill] = useState<any | null>(null);
+  const router = useRouter();
 
   async function getOrderDetailsByOrderId(id: number) {
     try {
@@ -14,7 +16,7 @@ export default function Invoice() {
       });
 
       if (res.data.status === 200 || res.data.status === 201) {
-        return res.data.data; // Trả về dữ liệu chi tiết đơn hàng
+        return res.data.data;
       }
       return [];
     } catch (error) {
@@ -23,81 +25,90 @@ export default function Invoice() {
     }
   }
 
-  async function getAllOrder() {
-    try {
-      const res = await axios.get("http://127.0.0.1:8000/api/orders", {
-        headers: {
-          Authorization: `Bearer ${Cookies.get("token_portal")}`
-        }
-      });
-
-      if (res.data.status === 200) {
-        const orders = res.data.data || [];
-
-        const ordersWithDetails = await Promise.all(
-          orders.map(async (order: any) => {
-            const orderDetails = await getOrderDetailsByOrderId(order.id);
-            return { ...order, details: orderDetails };
-          })
-        );
-
-        setBill(ordersWithDetails);
-        console.log("Danh sách hóa đơn:", ordersWithDetails);
-      } else {
-        alert("Lấy danh sách hóa đơn thất bại");
-      }
-    } catch (error) {
-      console.error("Lỗi khi lấy danh sách hóa đơn:", error);
-    }
-  }
-
   useEffect(() => {
-    getAllOrder();
+    const storedInvoice = localStorage.getItem("invoice");
+    if (storedInvoice) {
+      const invoice = JSON.parse(storedInvoice);
+      getOrderDetailsByOrderId(invoice.id).then((details) => {
+        setBill({
+          ...invoice,
+          vat: 0.05 * invoice.total_price,
+          shipping_fee: 30000,
+          final_total: invoice.total_price + 0.05 * invoice.total_price + 30000,
+          details,
+          customer_info: invoice.customer_info || {}
+        });
+      });
+    }
   }, []);
 
   function formatVND(amount: any) {
-    return amount.toLocaleString("vi-VN", { style: "currency", currency: "VND" });
+    if (!amount || isNaN(amount)) return "0 ₫";
+    return parseFloat(amount).toLocaleString("vi-VN", { style: "currency", currency: "VND" });
   }
 
-  const totalPrice = bill?.reduce((sum: number, order: any) => sum + order.total_price, 0) || 0;
-  const vat = totalPrice - totalPrice* 0.95;
-  const shippingFee = 50000;
-  const finalTotal = totalPrice + vat + shippingFee;
+  if (!bill) return <p>Đang tải hóa đơn...</p>;
 
   return (
     <div>
       <div id="invoice" className="invoice">
-        <h2>HÓA ĐƠN THANH TOÁN</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Ảnh</th>
-              <th>Tên sản phẩm</th>
-              <th>Giá</th>
-              <th>Số lượng</th>
-              <th>Tổng tiền</th>
-            </tr>
-          </thead>
-          <tbody>
-            {bill.map((item) => (
-              item.details.map((detail: any) => (
-                <tr key={detail.id}>
-                  <td className="cart-table-cell">
-                    <img src={`http://127.0.0.1:8000${detail.image}`} alt={detail.product_name} className="product-image" />
-                  </td>
-                  <td className="cart-table-cell">{detail.product_name}</td>
-                  <td className="cart-table-cell">{formatVND(parseFloat(detail.price))}</td>
-                  <td className="cart-table-cell">{detail.quantity}</td>
-                  <td className="cart-table-cell">{formatVND(parseFloat(detail.price) * detail.quantity) || "..."}</td>
-                </tr>
-              ))
-            ))}
-          </tbody>
-        </table>
-        <p className="total">Tổng tiền: {formatVND(totalPrice)}</p>
-        <p className="total">VAT (5%): {formatVND(vat)}</p>
-        <p className="total">Phí vận chuyển: {formatVND(shippingFee)}</p>
-        <p className="total">Thành tiền: {formatVND(finalTotal)}</p>
+        <h2 style={{ textAlign: "center", color: "#01ab78" }}>HÓA ĐƠN THANH TOÁN</h2>
+
+        {/* Thông tin khách hàng */}
+        <div className="customer-info" style={{ marginBottom: "20px" }}>
+          <p><strong>Tên khách hàng:</strong> {bill.customer_info?.name || "Chưa rõ"}</p>
+          <p><strong>SĐT:</strong> {bill.customer_info?.phone || "Chưa rõ"}</p>
+          <p><strong>Địa chỉ:</strong> {bill.customer_info?.address || "Chưa rõ"}</p>
+        </div>
+
+        {bill.details?.map((detail: any) => (
+          <div key={detail.id} className="product-row">
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <img
+                src={`http://127.0.0.1:8000${detail.image}`}
+                alt={detail.product_name}
+                className="product-image"
+              />
+              <div style={{ flex: 1 }}>
+                <p style={{ margin: 0, fontWeight: "bold" }}>{detail.product_name}</p>
+                <p style={{ margin: 0 }}>Số lượng: {detail.quantity}</p>
+              </div>
+            </div>
+            <div className="product-price">
+              <p style={{ margin: 0 }}>Giá: {formatVND(detail.unit_price)}</p>
+              <p style={{ margin: 0 }}>Tổng: {formatVND(parseFloat(detail.unit_price) * detail.quantity)}</p>
+            </div>
+          </div>
+        ))}
+
+        <div className="invoice-summary">
+          <h4>
+            Đơn hàng #{bill.id} - <span style={{ color: "#999" }}>{bill.order_code}</span>
+          </h4>
+          <p>Tổng giá: {formatVND(bill.total_price)}</p>
+          <p>VAT (5%): {formatVND(bill.vat)}</p>
+          <p style={{ textAlign: "right" }}>Phí vận chuyển: {formatVND(bill.shipping_fee)}</p>
+          <p style={{ fontWeight: "bold", color: "#c0392b", textAlign: "right" }}>
+            Thành tiền: {formatVND(bill.final_total)}
+          </p>
+        </div>
+
+        {/* Nút quay lại trang chủ */}
+        <div style={{ textAlign: "center", marginTop: 30 }}>
+          <button
+            onClick={() => router.push("/shop")}
+            style={{
+              padding: "10px 20px",
+              backgroundColor: "#01ab78",
+              color: "white",
+              border: "none",
+              borderRadius: "4px",
+              cursor: "pointer"
+            }}
+          >
+            Tiếp tục mua sắm
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -24,39 +24,53 @@ export default function HeaderComponent({ onLogin, onRegister, fullName, onHome,
             router.push("/shop");
         }
     };
+    const forceLogout = (message = "Bạn đã đăng xuất") => {
+        Cookies.remove("token_portal");
+        dispatch(setIsLogin(false));
+        dispatch(setUser(null));
+        dispatch(setToken(""));
+        dispatch(setCount(0));
+        router.push("/shop");
+        console.log(message);
+    };
+    
     const handlerLogout = () => {
         const isConfirmed = window.confirm("Bạn có chắc chắn muốn đăng xuất không?");
-        if (!isConfirmed) {
+        if (!isConfirmed) return;
+    
+        const token = Cookies.get("token_portal");
+        if (!token) {
+            forceLogout("Token không tồn tại");
             return;
         }
-        try {
-            axios
-                .post(
-                    "http://127.0.0.1:8000/api/auth/logout",
-                    {},
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`
-                        }
+    
+        axios
+            .post(
+                "http://127.0.0.1:8000/api/auth/logout",
+                {},
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
                     }
-                )
-                .then((response) => {
-                    console.log(response.status);
-                    
-                    if (response.status === 204) {
-                        dispatch(setCount(0));
-                        dispatch(setIsLogin(false));
-                        dispatch(setUser({}));
-                        dispatch(setToken(""));
-                        Cookies.remove("token_portal");
-                        router.push("/shop");
-                        alert("Đăng xuất thành công");
-                    }
-                });
-        } catch (e) {
-            console.log(e);
-        }
+                }
+            )
+            .then((response) => {
+                console.log("Logout response:", response.data);
+    
+                if (response.status === 401) {
+                    alert("Phiên đăng nhập đã hết hạn. Tự động đăng xuất!");
+                } else {
+                    alert("Đăng xuất thành công!");
+                }
+    
+                forceLogout();
+            })
+            .catch((error) => {
+                console.error("Lỗi khi logout:", error);
+                alert("Đăng xuất thất bại!");
+            });
     };
+    
     useEffect(() => {
         if (token && token !== "") {
             axios
@@ -148,7 +162,7 @@ export default function HeaderComponent({ onLogin, onRegister, fullName, onHome,
                                         <li className="header-cover-li-a header-cover-li-strong" style={{ marginRight: 8 }}>
                                             Xin chào { user ? user?.email : ''}
                                         </li>
-                                        <i className="fa-solid fa-right-from-bracket" onClick={handlerLogout} style={{ color: "#fff" }}></i>
+                                        <i className="fa-solid fa-right-from-bracket" onClick={handlerLogout} style={{ color: "#fff" , cursor: "pointer" }}></i>
                                     </>
                                 ) : (
                                     <>
