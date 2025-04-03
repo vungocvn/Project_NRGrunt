@@ -1,0 +1,95 @@
+.forgot-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 16px;
+  }
+  
+  .forgot-modal-container {
+    background: #fff;
+    border-radius: 12px;
+    padding: 32px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    position: relative;
+  }
+  
+  .forgot-modal-title {
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  
+  .forgot-modal-close {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    font-size: 22px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #666;
+  }
+  
+  .forgot-input {
+    width: 92%;
+    padding: 12px 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px; 
+    font-size: 14px;
+    margin-bottom: 20px;
+    outline: none;
+    background-color: #fff;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .forgot-input:focus {
+    border-color: #01ab78;
+    box-shadow: 0 0 0 2px rgba(1, 171, 120, 0.2);
+  }
+  
+  .forgot-modal-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 4px;
+  }
+  
+  .btn-primary {
+    flex: 1;
+    background-color: #01ab78;
+    color: #fff;
+    padding: 10px;
+    border-radius: 6px;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .btn-primary:hover {
+    background-color: #019e6e;
+  }
+  
+  .btn-secondary {
+    flex: 1;
+    background-color: #ccc;
+    color: #333;
+    padding: 10px;
+    border-radius: 6px;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .btn-secondary:hover {
+    background-color: #bbb;
+  }
+  
