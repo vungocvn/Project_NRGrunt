@@ -26,7 +26,7 @@ export default function CheckoutModal({ onClose, onSubmit }: Props) {
       await axios.put("http://127.0.0.1:8000/api/users/profile", {
         name,
         phone,
-        address
+        address,
       }, {
         headers: {
           Authorization: `Bearer ${Cookies.get("token_portal")}`

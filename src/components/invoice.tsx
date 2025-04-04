@@ -2,16 +2,20 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import { useDispatch } from "react-redux";
+import { setCount } from "@/store/slices/productsSlice";
 
 export default function Invoice() {
   const [bill, setBill] = useState<any | null>(null);
   const router = useRouter();
+  const dispatch = useDispatch();
 
+  // Hàm lấy chi tiết đơn hàng theo Order ID
   async function getOrderDetailsByOrderId(id: number) {
     try {
       const res = await axios.get(`http://127.0.0.1:8000/api/detail-orders/?order_id=${id}`, {
         headers: {
-          Authorization: `Bearer ${Cookies.get("token_portal")}`
+          Authorization: `Bearer ${Cookies.get("token_portal")}` // Lấy token từ Cookie
         }
       });
 
@@ -25,6 +29,7 @@ export default function Invoice() {
     }
   }
 
+  // Hàm lấy thông tin người dùng và chi tiết đơn hàng
   useEffect(() => {
     const storedInvoice = localStorage.getItem("invoice");
     if (storedInvoice) {
@@ -42,11 +47,13 @@ export default function Invoice() {
     }
   }, []);
 
+  // Định dạng tiền tệ (VND)
   function formatVND(amount: any) {
     if (!amount || isNaN(amount)) return "0 ₫";
     return parseFloat(amount).toLocaleString("vi-VN", { style: "currency", currency: "VND" });
   }
 
+  // Nếu không có hóa đơn, hiển thị đang tải
   if (!bill) return <p>Đang tải hóa đơn...</p>;
 
   return (
@@ -61,6 +68,7 @@ export default function Invoice() {
           <p><strong>Địa chỉ:</strong> {bill.customer_info?.address || "Chưa rõ"}</p>
         </div>
 
+        {/* Chi tiết sản phẩm trong đơn hàng */}
         {bill.details?.map((detail: any) => (
           <div key={detail.id} className="product-row">
             <div style={{ display: "flex", alignItems: "center" }}>
@@ -81,6 +89,7 @@ export default function Invoice() {
           </div>
         ))}
 
+        {/* Tổng hợp thông tin hóa đơn */}
         <div className="invoice-summary">
           <h4>
             Đơn hàng #{bill.id} - <span style={{ color: "#999" }}>{bill.order_code}</span>
@@ -96,7 +105,17 @@ export default function Invoice() {
         {/* Nút quay lại trang chủ */}
         <div style={{ textAlign: "center", marginTop: 30 }}>
           <button
-            onClick={() => router.push("/shop")}
+            onClick={() => {
+              localStorage.removeItem("invoice");
+              localStorage.removeItem("cart");
+              Cookies.set("cart_count", "0");
+
+              dispatch(setCount(0));
+
+              router.push("/shop").then(() => {
+                window.location.reload();
+              });
+            }}
             style={{
               padding: "10px 20px",
               backgroundColor: "#01ab78",
@@ -108,6 +127,7 @@ export default function Invoice() {
           >
             Tiếp tục mua sắm
           </button>
+
         </div>
       </div>
     </div>

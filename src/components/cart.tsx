@@ -108,7 +108,7 @@ export const Cart: React.FC<Props> = ({ onBack, setNotify }) => {
 
       await axios.put(
         "http://127.0.0.1:8000/api/users/profile",
-        { name, phone, address },
+        { name, phone, address, email: null, role: null },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -133,7 +133,15 @@ export const Cart: React.FC<Props> = ({ onBack, setNotify }) => {
       });
 
       if (res.data.status === 200 || res.data.status === 201) {
-        localStorage.setItem("invoice", JSON.stringify(res.data.data));
+        localStorage.setItem("invoice", JSON.stringify({
+          ...res.data.data,
+          customer_info: {
+            name,
+            phone,
+            address
+          }
+        }));
+        
         router.push("/invoice");
       } else {
         alert("Đặt hàng thất bại");
