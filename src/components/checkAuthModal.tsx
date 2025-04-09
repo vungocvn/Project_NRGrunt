@@ -13,7 +13,6 @@ export default function CheckoutModal({ onClose, onSubmit }: Props) {
   const [address, setAddress] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // ✅ Tự động lấy thông tin user nếu đã login
   useEffect(() => {
     const token = Cookies.get("token_portal");
     if (token) {
@@ -32,7 +31,6 @@ export default function CheckoutModal({ onClose, onSubmit }: Props) {
     }
   }, []);
   
-
   const handleSubmit = async () => {
     console.log("token_portal", Cookies.get("token_portal"));
     if (!name || !phone || !address) {
@@ -43,7 +41,7 @@ export default function CheckoutModal({ onClose, onSubmit }: Props) {
     const token = Cookies.get("token_portal");
     if (!token) {
       alert("Vui lòng đăng nhập để tiếp tục đặt hàng.");
-      onClose(); // hoặc mở modal login
+      onClose(); 
       return;
     }
 

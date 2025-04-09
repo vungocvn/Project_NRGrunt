@@ -154,7 +154,7 @@ export const ProdDetail: React.FC<Props> = ({ onBack, idProduct }) => {
           </div>
         </div>
         <div className="product-info">
-              <h3>Thông Tin</h3>
+              <h3>Thông tin sản phẩm</h3>
              <div className="desc" dangerouslySetInnerHTML={{ __html: product?.description }}></div>
             
             </div>
