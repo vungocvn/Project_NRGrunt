@@ -661,21 +661,30 @@
 .container .content-cover-nav-one {
   display: block;
   flex: 1;
-  border-bottom-left-radius: 2px;
-  border-bottom-right-radius: 2px;
   border: 1px solid rgba(0, 0, 0, 0.1);
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
-  transition: transform linear ease-in 0.1s;
   background-color: #fff;
+  transition: border-color 0.3s ease, background-color 0.3s ease;
   will-change: transform;
 }
 .container .content-cover-nav-one .content-cover-title {
   font-size: 14px;
 }
+.container .content-cover-nav-one .content-cover-image {
+  overflow: hidden;
+}
+.container .content-cover-nav-one .content-cover-image img {
+  width: 100%;
+  display: block;
+  transition: transform 0.4s ease, filter 0.3s ease;
+}
 .container .content-cover-nav-one:hover {
   cursor: pointer;
-  transform: translateY(-2px);
-  box-shadow: 0 1px 20px 0 rgba(0, 0, 0, 0.194);
+  border-color: var(--primary-color);
+  background-color: #fcfcfc;
+}
+.container .content-cover-nav-one:hover .content-cover-image img {
+  filter: brightness(1.03);
+  transform: scale(1.05);
 }
 .container .title-many-cover {
   padding: 5px;
@@ -949,6 +958,30 @@
 }
 .modal .auth-form-controls-back {
   margin-right: 8px;
+}
+
+.notify-popup {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: #01ab78;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 6px;
+  z-index: 10000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  animation: fadein 0.3s ease;
+}
+
+@keyframes fadein {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /*# sourceMappingURL=shop.css.map */
