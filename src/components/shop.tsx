@@ -241,7 +241,7 @@ export default function Shop() {
                 dispatch(setIsLogin(true));
                 dispatch(setToken(access_token));
                 Cookies.set("token_portal", access_token, { expires: 1 });
-                toast.success("Logged in successfully!");
+                toast.success("Login successfully!");
             } else {
                 toast.error("Login failed. Please try again!");
             }
