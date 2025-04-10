@@ -221,7 +221,7 @@ export const Cart: React.FC<Props> = ({ onBack, setNotify }) => {
 
         <div className="footer-button">
           <button className="checkout-btn" onClick={handleCheckoutClick}>
-            Thanh Toán
+            Đặt hàng
           </button>
         </div>
       </div>

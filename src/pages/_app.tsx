@@ -9,11 +9,13 @@ import "@/styles/forgot.css";
 import type { AppProps } from "next/app";
 import { ReduxProvider } from "@/store/provider";
 import {FooterComponents} from "@/components/FooterComponents";
-
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css'; 
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <ReduxProvider>
       <Component {...pageProps} />
+      <ToastContainer />
         <FooterComponents />
     </ReduxProvider>
   );

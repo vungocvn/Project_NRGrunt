@@ -5,6 +5,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { useDispatch } from "react-redux";
 import { setCount } from "@/store/slices/productsSlice";
+import { toast } from "react-toastify";
 
 interface Props {
   onBack: (product: any) => void
@@ -75,6 +76,13 @@ export const ProdDetail: React.FC<Props> = ({ onBack, idProduct }) => {
     "category_id": 1
   });
   function addCart(type: string) {
+    if (!token) {
+      toast.info("please login to buy!", {
+        position: "top-center",
+        autoClose: 3000
+      });
+      return;
+    }
     axios.post(`http://127.0.0.1:8000/api/carts`, { product_id: idProduct, quantity: quantity }
       , {
         headers: {
@@ -85,18 +93,34 @@ export const ProdDetail: React.FC<Props> = ({ onBack, idProduct }) => {
       .then(res => {
         console.log(res.data);
         if (res.data.status === 200) {
-          if(type === "buy"){
+          if (type === "buy") {
             router.push("/cart");
-          }else{
-          alert("Thêm vào giỏ hàng thành công");            
+          } else {
+            toast.success("Add to cart successfully!", {
+              position: "top-right",
+              autoClose: 2000
+            });
           }
           getCart();
         } else {
-          alert("Thêm vào giỏ hàng thất bại");
+          toast.error("Add to cart error!", {
+            position: "top-right"
+          });
         }
       })
-      .catch(error => console.log(error))
-    console.log("access_token", token);
+      .catch(error => {
+        console.log(error);
+        if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+          toast.info("please login to buy!", {
+            position: "top-center",
+            autoClose: 3000
+          });
+        } else {
+          toast.error("An error occurred, please try again later.", {
+            position: "top-right"
+          });
+        }
+      });
   }
   useEffect(() => {
     const token = Cookies.get('token_portal') || "";
@@ -126,7 +150,7 @@ export const ProdDetail: React.FC<Props> = ({ onBack, idProduct }) => {
         {/* Ảnh sản phẩm */}
         <div className="product-cover">
           <div className="product-gallery">
-            <img src={`http://127.0.0.1:8000${product?.image}`} alt="" className="product-image" style={{width:'100%', height:'50%',objectFit:'cover'}} />
+            <img src={`http://127.0.0.1:8000${product?.image}`} alt="" className="product-image" style={{ width: '100%', height: '50%', objectFit: 'cover' }} />
           </div>
 
           {/* Thông tin sản phẩm */}
@@ -137,8 +161,8 @@ export const ProdDetail: React.FC<Props> = ({ onBack, idProduct }) => {
             </p>
             <p>
               <strong>Giá:</strong>{" "}
-              <span className="discount-price">{formatVND(product?.price-(product?.price * (product?.discount)))}</span>{" "}
-              <del className="original-price">{formatVND(product?.price)}</del> ({product?.discount*100}%)
+              <span className="discount-price">{formatVND(product?.price - (product?.price * (product?.discount)))}</span>{" "}
+              <del className="original-price">{formatVND(product?.price)}</del> ({product?.discount * 100}%)
             </p>
             <div className="quantity-cell-border" style={{ width: 80, textAlign: "center" }}>
               <span onClick={() => minusQuantity()} className="quantity-btn btn-one ">-</span>
@@ -150,14 +174,14 @@ export const ProdDetail: React.FC<Props> = ({ onBack, idProduct }) => {
               <button className="add-to-cart" onClick={() => addCart("cart")}><i className="fa-solid fa-cart-shopping"></i> Thêm Vào Giỏ</button>
             </div>
             {/* Thông tin sản phẩm */}
-           
+
           </div>
         </div>
         <div className="product-info">
-              <h3>Thông tin sản phẩm</h3>
-             <div className="desc" dangerouslySetInnerHTML={{ __html: product?.description }}></div>
-            
-            </div>
+          <h3>Thông tin sản phẩm</h3>
+          <div className="desc" dangerouslySetInnerHTML={{ __html: product?.description }}></div>
+
+        </div>
       </div>
     </>
   );

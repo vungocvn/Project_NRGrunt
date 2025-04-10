@@ -15,7 +15,7 @@ import { setIsLogin, setToken, setUser } from "@/store/slices/authSlice";
 import { setCount, setDataProduct, setLoading, setSearch, setTotal, Total } from "@/store/slices/productsSlice";
 import LoadingScreen from "./Loading";
 import ForgotPasswordModal from "@/components/ForgotPasswordClientModal";
-
+import { toast } from "react-toastify";
 export default function Shop() {
     const [selectedProd, setSelectedProd] = useState(null);
     const [openModel, setOpenModel] = useState(false);
@@ -55,7 +55,10 @@ export default function Shop() {
             setOpenModel(false);
         }
     }
-
+    function isValidEmail(email: string) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+      }      
     // Forgot Password modal toggling
     function openForgotModalHandler() {
         // Close the login/register modal if open
@@ -98,6 +101,15 @@ export default function Shop() {
                 })
                 .then((res) => {
                     if (res.data.status === 200) {
+                        const items = res.data.data.items;
+                        if (search && items.length === 0) {
+                            toast.info("Không tìm thấy sản phẩm nào phù hợp!", {
+                                position: "top-center",
+                                autoClose: 3000,
+                                className: "custom-toast",
+                                progressClassName: "custom-progress"
+                            });
+                        }
                         dispatch(
                             setTotal({
                                 ...total,
@@ -124,7 +136,6 @@ export default function Shop() {
         }
     }
 
-    // ========== API: getAllCategory ==========
     function getAllCategory() {
         axios
             .get("http://127.0.0.1:8000/api/categories")
@@ -151,21 +162,31 @@ export default function Shop() {
 
     // ========== Handle Register ==========
     const handleRegister = () => {
+        if (!register.name || !register.email || !register.password) {
+            toast.warn("Please enter full information!");
+            return;
+        }
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(register.email)) {
+            toast.warn("Email is not in correct format. Please try again!");
+            return;
+        }
         axios
             .post("http://127.0.0.1:8000/api/users/register", register)
             .then((res) => {
                 if (res.data.status === 201) {
                     const access_token = res.data.token;
                     Cookies.set("token_portal", access_token, { expires: 1 });
-                    alert("Sign up successfully!");
+                    toast.success("Sign up successfully!");
                     setSelectAuth(true);
                     setLogin({ ...login, email: register.email, password: register.password });
                 } else {
-                    alert("Sign up error, please try again!");
+                   toast.error("Sign up error, please try again!");
                 }
             })
             .catch((error) => {
                 console.error("Error in sign up", error);
+                toast.error("Email đã tồn tại hoặc có lỗi xảy ra!");
             });
     };
 
@@ -191,39 +212,62 @@ export default function Shop() {
 
     // ========== Handle Login ==========
     const handleLogin = async () => {
+        if (!login.email || !login.password) {
+            toast.warn("Please enter your email and password!");
+            return;
+        }
+    
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(login.email)) {
+            toast.warn("Please enter a valid email address!");
+            return;
+        }
+    
         try {
             dispatch(setLoading(true));
-            // Close auth modal as soon as we initiate
             openModelHandler(false);
-            await axios
-                .post("http://127.0.0.1:8000/api/auth/login", {
-                    email: login.email,
-                    password: login.password,
-                    role: "Customer",
-                })
-                .then((res) => {
-                    if (res.data.status === 200) {
-                        getCart();
-                        const access_token = res.data.data["access_token"];
-                        const user = res.data.data;
-                        dispatch(setUser(user));
-                        dispatch(setIsLogin(true));
-                        dispatch(setToken(access_token));
-                        Cookies.set("token_portal", access_token, { expires: 1 });
-                        alert("Đăng nhập thành công!");
-                    } else {
-                        alert("Đăng nhập thất bại, xin vui lòng thử lại!");
-                    }
-                    dispatch(setLoading(false));
-                })
-                .catch((error) => {
-                    console.error("Error in sign up", error);
-                });
-        } catch (error) {
-            console.error("Error in sign up", error);
+    
+            const res = await axios.post("http://127.0.0.1:8000/api/auth/login", {
+                email: login.email,
+                password: login.password,
+                role: "Customer",
+            });
+    
+            if (res.data.status === 200) {
+                getCart();
+                const access_token = res.data.data["access_token"];
+                const user = res.data.data;
+                dispatch(setUser(user));
+                dispatch(setIsLogin(true));
+                dispatch(setToken(access_token));
+                Cookies.set("token_portal", access_token, { expires: 1 });
+                toast.success("Logged in successfully!");
+            } else {
+                toast.error("Login failed. Please try again!");
+            }
+        } catch (error: any) {
+            if (error.response) {
+                const status = error.response.status;
+    
+                if (status === 401) {
+                    toast.error("Incorrect email or password!");
+                } else if (status === 422) {
+                    toast.error("Invalid input. Please check your credentials.");
+                } else {
+                    toast.error("An unexpected error occurred. Please try again.");
+                }
+            } else {
+                toast.error("Network error. Please check your connection.");
+            }
+    
+            console.error("Login error:", error);
+        } finally {
             dispatch(setLoading(false));
         }
     };
+    
+    
+    
 
     // ========== Check Auth (on mount) ==========
     useEffect(() => {
