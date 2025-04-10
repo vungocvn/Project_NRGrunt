@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import HeaderComponent from './HeaderComponent';
-import '@/styles/shop.css';
+import HeaderComponent from "./HeaderComponent";
+import "@/styles/shop.css";
 import { useRouter } from "next/router";
 import axios from "axios";
 import Cookies from "js-cookie";
@@ -31,15 +31,13 @@ export const Cart: React.FC<Props> = ({ onBack, setNotify }) => {
   const [vat, setVat] = useState(0);
   const [finalTotal, setFinalTotal] = useState(0);
   const [showModal, setShowModal] = useState(false);
+  const [selectedItems, setSelectedItems] = useState<CartItem[]>([]);
 
   const { token } = useSelector((state: any) => ({
     token: state.auth.token
   }));
 
-  const totalPrice = cartItems.reduce(
-    (sum, item) => sum + parseFloat(item.price) * item.quantity,
-    0
-  );
+  const totalPrice = selectedItems.reduce((sum, item) => sum + parseFloat(item.price) * item.quantity, 0);
 
   useEffect(() => {
     const vatAmount = totalPrice * 0.05;
@@ -49,12 +47,13 @@ export const Cart: React.FC<Props> = ({ onBack, setNotify }) => {
 
   const getCart = () => {
     const token = Cookies.get("token_portal") || "";
-    axios.get(`http://127.0.0.1:8000/api/carts`, {
-      params: { page: 1, page_size: 100 },
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
+    axios
+      .get(`http://127.0.0.1:8000/api/carts`, {
+        params: { page: 1, page_size: 100 },
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
       .then((res) => {
         if (res.data.status === 200) {
           setCartItems(res.data.data);
@@ -65,33 +64,33 @@ export const Cart: React.FC<Props> = ({ onBack, setNotify }) => {
   };
 
   const updateCart = (cart_id: number, product_id: number, quantity: number) => {
-    axios.put(`http://127.0.0.1:8000/api/carts/${cart_id}`,
-      { product_id, quantity },
-      {
-        headers: {
-          Authorization: `Bearer ${Cookies.get("token_portal")}`
+    axios
+      .put(
+        `http://127.0.0.1:8000/api/carts/${cart_id}`,
+        { product_id, quantity },
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get("token_portal")}`
+          }
         }
-      }
-    ).catch(error => console.log(error));
+      )
+      .catch((error) => console.log(error));
   };
 
   const updateQuantity = (id: number, delta: number, quantity: number, product_id: number) => {
     const newQty = Math.max(1, quantity + delta);
-    setCartItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === id ? { ...item, quantity: newQty } : item
-      )
-    );
+    setCartItems((prevItems) => prevItems.map((item) => (item.id === id ? { ...item, quantity: newQty } : item)));
     updateCart(id, product_id, newQty);
   };
 
   const deleteCart = (id: number) => {
-    axios.delete(`http://127.0.0.1:8000/api/carts/${id}`, {
-      headers: {
-        Authorization: `Bearer ${Cookies.get("token_portal")}`
-      }
-    })
-      .then(res => {
+    axios
+      .delete(`http://127.0.0.1:8000/api/carts/${id}`, {
+        headers: {
+          Authorization: `Bearer ${Cookies.get("token_portal")}`
+        }
+      })
+      .then((res) => {
         if ([200, 204, 404].includes(res.data.status) || res.data.status === undefined) {
           getCart();
           alert("Delete cart success");
@@ -99,7 +98,7 @@ export const Cart: React.FC<Props> = ({ onBack, setNotify }) => {
           alert("Xóa giỏ hàng thất bại");
         }
       })
-      .catch(error => console.log(error));
+      .catch((error) => console.log(error));
   };
 
   const handleOrder = async (name: string, phone: string, address: string) => {
@@ -111,37 +110,39 @@ export const Cart: React.FC<Props> = ({ onBack, setNotify }) => {
         { name, phone, address, email: null, role: null },
         {
           headers: {
-            Authorization: `Bearer ${token}`,
-          },
+            Authorization: `Bearer ${token}`
+          }
         }
       );
-
       const payload = {
-        cart_ids: cartItems.map((item) => item.id),
+        cart_ids: selectedItems.map((item) => item.id),
         total_price: totalPrice,
         vat: vat,
         shipping_fee: shippingFee,
         final_total: finalTotal,
         phone,
-        address,
+        address
       };
 
       const res = await axios.post(`http://127.0.0.1:8000/api/orders`, payload, {
         headers: {
-          Authorization: `Bearer ${token}`,
-        },
+          Authorization: `Bearer ${token}`
+        }
       });
 
       if (res.data.status === 200 || res.data.status === 201) {
-        localStorage.setItem("invoice", JSON.stringify({
-          ...res.data.data,
-          customer_info: {
-            name,
-            phone,
-            address
-          }
-        }));
-        
+        localStorage.setItem(
+          "invoice",
+          JSON.stringify({
+            ...res.data.data,
+            customer_info: {
+              name,
+              phone,
+              address
+            }
+          })
+        );
+
         router.push("/invoice");
       } else {
         alert("Đặt hàng thất bại");
@@ -165,8 +166,22 @@ export const Cart: React.FC<Props> = ({ onBack, setNotify }) => {
       setNotify?.("Vui lòng đăng nhập để thanh toán");
       return;
     }
+    if (selectedItems.length === 0) {
+      alert("Vui lòng chọn sản phẩm để đặt hàng!");
+      return;
+    }
     setShowModal(true);
   };
+
+  // Hàm để xử lý sự kiện khi checkbox được chọn hoặc bỏ chọn
+  const handleSelectItem = (item: CartItem, isSelected: boolean) => {
+    if (isSelected) {
+      setSelectedItems((prev) => [...prev, item]);
+    }else {
+      setSelectedItems((prev) => prev.filter((i) => i.id !== item.id));
+    }
+  }
+console.log("selectedItems", selectedItems);
 
   return (
     <>
@@ -178,6 +193,7 @@ export const Cart: React.FC<Props> = ({ onBack, setNotify }) => {
         <table className="cart-table">
           <thead>
             <tr className="cart-table-header">
+              <th className="cart-table-cell">Chọn</th>
               <th className="cart-table-cell">Hình ảnh</th>
               <th className="cart-table-cell">Sản phẩm</th>
               <th className="cart-table-cell">Giá</th>
@@ -189,6 +205,10 @@ export const Cart: React.FC<Props> = ({ onBack, setNotify }) => {
           <tbody>
             {cartItems.map((item) => (
               <tr key={item.id}>
+                <td className="cart-table-cell" style={{ width: "10px", paddingLeft: 20 }}>
+                  <CheckboxSimple onSelectItem={(val)=>handleSelectItem(item,val)}/>
+                </td>
+
                 <td className="cart-table-cell">
                   <img src={`http://127.0.0.1:8000${item.image}`} alt={item.product_name} className="product-image" />
                 </td>
@@ -196,9 +216,13 @@ export const Cart: React.FC<Props> = ({ onBack, setNotify }) => {
                 <td className="cart-table-cell">{formatVND(parseFloat(item.price))}</td>
                 <td className="cart-table-cell quantity-cell">
                   <div className="quantity-cell-border">
-                    <span onClick={() => updateQuantity(item.id, -1, item.quantity, item.product_id)} className="quantity-btn btn-one">-</span>
+                    <span onClick={() => updateQuantity(item.id, -1, item.quantity, item.product_id)} className="quantity-btn btn-one">
+                      -
+                    </span>
                     <span className="quantity">{item.quantity}</span>
-                    <span onClick={() => updateQuantity(item.id, 1, item.quantity, item.product_id)} className="quantity-btn btn-two">+</span>
+                    <span onClick={() => updateQuantity(item.id, 1, item.quantity, item.product_id)} className="quantity-btn btn-two">
+                      +
+                    </span>
                   </div>
                 </td>
                 <td className="cart-table-cell">{formatVND(parseFloat(item.price) * item.quantity)}</td>
@@ -239,3 +263,22 @@ export const Cart: React.FC<Props> = ({ onBack, setNotify }) => {
 };
 
 export default Cart;
+const CheckboxSimple = ({ onSelectItem }: { onSelectItem?: (val: boolean) => void }) => {
+  const [checked, setChecked] = useState(false);
+
+  return (
+    <label className="flex items-center space-x-2 cursor-pointer">
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={(e) => {
+          setChecked(e.target.checked);
+          if (onSelectItem) onSelectItem(e.target.checked);
+          console.log(e.target.checked);
+          // Hàm này được gọi khi checkbox được chọn hoặc bỏ chọn
+        }}
+        className="w-5 h-5 accent-blue-600"
+      />
+    </label>
+  );
+};
