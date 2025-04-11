@@ -1299,3 +1299,23 @@
       transform: translateY(0);
    }
 }
+.layout-wrapper {
+   display: flex;
+   flex-direction: column;
+   min-height: 100vh; // Chiếm đủ chiều cao màn
+ }
+ 
+ .layout-content {
+   flex: 1; // Giúp nội dung co giãn đẩy footer xuống
+ }
+ 
+ .footer {
+   background: #f5f5f5; // Cho dễ nhìn
+   width: 100%; // Đảm bảo luôn full width
+ }
+ .footer .container {
+   max-width: 100% !important;
+   width: 100% !important;
+   padding: 0;
+ }
+  

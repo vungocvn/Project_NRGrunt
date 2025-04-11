@@ -15,7 +15,7 @@ import 'react-toastify/dist/ReactToastify.css';
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <ReduxProvider>
-      <div className="container">
+      <div className="layout-wrapper">
         <Component {...pageProps} />
         <ToastContainer />
         <FooterComponents />

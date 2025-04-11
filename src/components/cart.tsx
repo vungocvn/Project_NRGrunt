@@ -32,6 +32,7 @@ export const Cart: React.FC<Props> = ({ onBack, setNotify }) => {
   const [finalTotal, setFinalTotal] = useState(0);
   const [showModal, setShowModal] = useState(false);
   const [selectedItems, setSelectedItems] = useState<CartItem[]>([]);
+  const [selectAll, setSelectAll] = useState(false);
 
   const { token } = useSelector((state: any) => ({
     token: state.auth.token
@@ -173,15 +174,22 @@ export const Cart: React.FC<Props> = ({ onBack, setNotify }) => {
     setShowModal(true);
   };
 
-  // Hàm để xử lý sự kiện khi checkbox được chọn hoặc bỏ chọn
   const handleSelectItem = (item: CartItem, isSelected: boolean) => {
     if (isSelected) {
       setSelectedItems((prev) => [...prev, item]);
-    }else {
+    } else {
       setSelectedItems((prev) => prev.filter((i) => i.id !== item.id));
     }
-  }
-console.log("selectedItems", selectedItems);
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    setSelectAll(checked);
+    if (checked) {
+      setSelectedItems(cartItems);
+    } else {
+      setSelectedItems([]);
+    }
+  };
 
   return (
     <>
@@ -206,9 +214,11 @@ console.log("selectedItems", selectedItems);
             {cartItems.map((item) => (
               <tr key={item.id}>
                 <td className="cart-table-cell" style={{ width: "10px", paddingLeft: 20 }}>
-                  <CheckboxSimple onSelectItem={(val)=>handleSelectItem(item,val)}/>
+                  <CheckboxSimple
+                    onSelectItem={(val) => handleSelectItem(item, val)}
+                    isChecked={selectedItems.some((i) => i.id === item.id)}
+                  />
                 </td>
-
                 <td className="cart-table-cell">
                   <img src={`http://127.0.0.1:8000${item.image}`} alt={item.product_name} className="product-image" />
                 </td>
@@ -216,13 +226,9 @@ console.log("selectedItems", selectedItems);
                 <td className="cart-table-cell">{formatVND(parseFloat(item.price))}</td>
                 <td className="cart-table-cell quantity-cell">
                   <div className="quantity-cell-border">
-                    <span onClick={() => updateQuantity(item.id, -1, item.quantity, item.product_id)} className="quantity-btn btn-one">
-                      -
-                    </span>
+                    <span onClick={() => updateQuantity(item.id, -1, item.quantity, item.product_id)} className="quantity-btn btn-one">-</span>
                     <span className="quantity">{item.quantity}</span>
-                    <span onClick={() => updateQuantity(item.id, 1, item.quantity, item.product_id)} className="quantity-btn btn-two">
-                      +
-                    </span>
+                    <span onClick={() => updateQuantity(item.id, 1, item.quantity, item.product_id)} className="quantity-btn btn-two">+</span>
                   </div>
                 </td>
                 <td className="cart-table-cell">{formatVND(parseFloat(item.price) * item.quantity)}</td>
@@ -233,6 +239,15 @@ console.log("selectedItems", selectedItems);
                 </td>
               </tr>
             ))}
+            <tr>
+            <td className="cart-table-cell" colSpan={7} style={{ textAlign: "left", padding: "12px 20px" }}>
+  <label className="flex items-center gap-2 font-medium cursor-pointer">
+    <CheckboxSimple isChecked={selectAll} onSelectItem={handleSelectAll} />
+    Chọn tất cả sản phẩm
+  </label>
+</td>
+
+            </tr>
           </tbody>
         </table>
 
@@ -263,8 +278,13 @@ console.log("selectedItems", selectedItems);
 };
 
 export default Cart;
-const CheckboxSimple = ({ onSelectItem }: { onSelectItem?: (val: boolean) => void }) => {
-  const [checked, setChecked] = useState(false);
+
+const CheckboxSimple = ({ onSelectItem, isChecked = false }: { onSelectItem?: (val: boolean) => void; isChecked?: boolean }) => {
+  const [checked, setChecked] = useState(isChecked);
+
+  useEffect(() => {
+    setChecked(isChecked);
+  }, [isChecked]);
 
   return (
     <label className="flex items-center space-x-2 cursor-pointer">
@@ -274,8 +294,6 @@ const CheckboxSimple = ({ onSelectItem }: { onSelectItem?: (val: boolean) => voi
         onChange={(e) => {
           setChecked(e.target.checked);
           if (onSelectItem) onSelectItem(e.target.checked);
-          console.log(e.target.checked);
-          // Hàm này được gọi khi checkbox được chọn hoặc bỏ chọn
         }}
         className="w-5 h-5 accent-blue-600"
       />
