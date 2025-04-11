@@ -209,29 +209,11 @@ export const ProdDetail: React.FC<Props> = ({ onBack, idProduct }) => {
               </span>
             </div>
             <div className="button-detail">
-              <label>
-                <input
-                  type="checkbox"
-                  checked={selected}
-                  onChange={() => setSelected(!selected)}
-                  style={{ marginRight: "8px" }}
-                />
-                Chọn sản phẩm này
-              </label>
               <button className="buy-now" onClick={() => addCart("buy")}>Mua Ngay</button>
               <button className="add-to-cart" onClick={() => addCart("cart")}>
                 <i className="fa-solid fa-cart-shopping"></i> Thêm Vào Giỏ
               </button>
               <div style={{ marginTop: "12px" }}>
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={selectAll}
-                    onChange={() => setSelectAll(!selectAll)}
-                    style={{ marginRight: "8px" }}
-                  />
-                  Chọn tất cả
-                </label>
               </div>
             </div>
           </div>
