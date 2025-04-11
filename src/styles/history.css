@@ -1,0 +1,113 @@
+.history-container {
+    margin: 110px auto 40px;
+    max-width: 960px;
+    padding: 24px;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease-in-out;
+  
+    h2 {
+      text-align: center;
+      margin-bottom: 24px;
+      font-size: 28px;
+      font-weight: 600;
+      color: #01ab78;
+    }
+  
+    .filter-box {
+      text-align: right;
+      margin-bottom: 18px;
+  
+      label {
+        font-weight: 500;
+        margin-right: 8px;
+      }
+  
+      select {
+        padding: 6px 12px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        font-size: 14px;
+        transition: all 0.2s;
+  
+        &:focus {
+          border-color: #01ab78;
+          outline: none;
+        }
+      }
+    }
+  
+    .order-table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  
+      th {
+        background-color: #f3f6f9;
+        padding: 14px;
+        font-size: 15px;
+        font-weight: 600;
+        color: #444;
+        text-align: center;
+      }
+  
+      td {
+        padding: 14px 12px;
+        font-size: 14px;
+        color: #444;
+        text-align: center;
+        border-top: 1px solid #f0f0f0;
+  
+        &:last-child {
+          white-space: nowrap;
+        }
+      }
+  
+      tr {
+        transition: background-color 0.3s ease;
+  
+        &:hover {
+          background-color: #f7fcfa;
+        }
+      }
+    }
+  
+    .view-link {
+      color: #01ab78;
+      font-weight: 500;
+      text-decoration: none;
+      transition: color 0.2s;
+  
+      &:hover {
+        color: #018c65;
+        text-decoration: underline;
+      }
+    }
+    @media screen and (max-width: 768px) {
+      padding: 16px;
+  
+      .order-table {
+        font-size: 12px;
+  
+        th, td {
+          padding: 10px 8px;
+        }
+      }
+  
+      h2 {
+        font-size: 24px;
+      }
+  
+      .filter-box {
+        text-align: left;
+        select {
+          font-size: 13px;
+        }
+      }
+    }
+  }
+  

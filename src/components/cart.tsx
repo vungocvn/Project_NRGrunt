@@ -163,11 +163,11 @@ export const Cart: React.FC<Props> = ({ onBack, setNotify }) => {
 
   const handleCheckoutClick = () => {
     if (!token) {
-      setNotify?.("Vui lòng đăng nhập để thanh toán");
+      setNotify?.("Please select product to order");
       return;
     }
     if (selectedItems.length === 0) {
-      alert("Vui lòng chọn sản phẩm để đặt hàng!");
+      alert("Please select product to order!");
       return;
     }
     setShowModal(true);

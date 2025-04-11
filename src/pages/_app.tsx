@@ -6,6 +6,7 @@ import "@/styles/reponsive.css";
 import "@/styles/invoice.css";
 import "@/styles/globals.css";
 import "@/styles/forgot.css";
+import "@/styles/history.css";
 import type { AppProps } from "next/app";
 import { ReduxProvider } from "@/store/provider";
 import {FooterComponents} from "@/components/FooterComponents";
@@ -14,9 +15,12 @@ import 'react-toastify/dist/ReactToastify.css';
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <ReduxProvider>
-      <Component {...pageProps} />
-      <ToastContainer />
+      <div className="container">
+        <Component {...pageProps} />
+        <ToastContainer />
         <FooterComponents />
+      </div>
     </ReduxProvider>
   );
 }
+

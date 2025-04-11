@@ -8,13 +8,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { setIsLogin, setToken, setUser } from "@/store/slices/authSlice";
 import { Value } from "sass";
 import { setCount, setSearch } from "@/store/slices/productsSlice";
+import Link from "next/link";
 export default function HeaderComponent({ onLogin, onRegister, fullName, onHome, isHome, onSearch, search }: { onLogin?: any; onRegister?: any; fullName?: string; onHome?: () => void; isHome?: boolean; onSearch?: () => void; search?: string; }) {
     const router = useRouter();
-    const {isLogin, user, token,count } = useSelector((state:any)=>({
-        isLogin : state.auth.isLogin, // false
-        user : state.auth.user,
-        token : state.auth.token,
-        count : state.product.count
+    const { isLogin, user, token, count } = useSelector((state: any) => ({
+        isLogin: state.auth.isLogin, // false
+        user: state.auth.user,
+        token: state.auth.token,
+        count: state.product.count
     }))
     const dispatch = useDispatch();
     const handleBack = () => {
@@ -33,17 +34,17 @@ export default function HeaderComponent({ onLogin, onRegister, fullName, onHome,
         router.push("/shop");
         console.log(message);
     };
-    
+
     const handlerLogout = () => {
         const isConfirmed = window.confirm("Bạn có chắc chắn muốn đăng xuất không?");
         if (!isConfirmed) return;
-    
+
         const token = Cookies.get("token_portal");
         if (!token) {
             forceLogout("Token không tồn tại");
             return;
         }
-    
+
         axios
             .post(
                 "http://127.0.0.1:8000/api/auth/logout",
@@ -56,13 +57,13 @@ export default function HeaderComponent({ onLogin, onRegister, fullName, onHome,
             )
             .then((response) => {
                 console.log("Logout response:", response.data);
-    
+
                 if (response.status === 401) {
                     alert("Phiên đăng nhập đã hết hạn. Tự động đăng xuất!");
                 } else {
                     alert("Đăng xuất thành công!");
                 }
-    
+
                 forceLogout();
             })
             .catch((error) => {
@@ -70,7 +71,7 @@ export default function HeaderComponent({ onLogin, onRegister, fullName, onHome,
                 alert("Đăng xuất thất bại!");
             });
     };
-    
+
     useEffect(() => {
         if (token && token !== "") {
             axios
@@ -157,13 +158,28 @@ export default function HeaderComponent({ onLogin, onRegister, fullName, onHome,
                                     <i className="header-navbar-icon fa-regular fa-circle-question"></i>
                                     Trợ giúp
                                 </li>
-                                {isLogin && token !='' ? (
-                                    <>
-                                        <li className="header-cover-li-a header-cover-li-strong" style={{ marginRight: 8 }}>
-                                            Xin chào { user ? user?.email : ''}
-                                        </li>
-                                        <i className="fa-solid fa-right-from-bracket" onClick={handlerLogout} style={{ color: "#fff" , cursor: "pointer" }}></i>
-                                    </>
+                                {isLogin && token != '' ? (
+                                   <li className="header-cover-li-a header-cover-li-strong">
+                                   <div className="header-user-dropdown">
+                                     <div className="header-user-info">
+                                       <img
+                                        //   src="http://127.0.0.1:8000/storage/images/avatar.jpg"
+                                         alt="avatar"
+                                         className="user-avatar"
+                                       />
+                                       <span className="username">Xin chào {user?.email}</span>
+                                     </div>
+                                     <ul className="user-dropdown-menu">
+                                       <li>
+                                         <Link href="/his"><i className="fa-solid fa-cart-shopping"></i>Đơn hàng của bạn</Link>
+                                       </li>
+                                       <li onClick={handlerLogout}>
+                                         <span><i className="fa-solid fa-right-from-bracket"></i>Đăng xuất</span>
+                                       </li>
+                                     </ul>
+                                   </div>
+                                 </li>
+                                 
                                 ) : (
                                     <>
                                         <li className="header-cover-li-a header-cover-li-strong" onClick={onRegister}>
@@ -188,9 +204,9 @@ export default function HeaderComponent({ onLogin, onRegister, fullName, onHome,
                         <input type="checkbox" hidden id="mobile-search-checkbox" className="header-search-checkbox " />
                         <div className="header-search">
                             <div className="header-search-input-wrap">
-                                <input type="text" className="header-search-input" placeholder="Nhập để tìm kiếm sản phẩm" value={search} onChange={(e)=>{
+                                <input type="text" className="header-search-input" placeholder="Nhập để tìm kiếm sản phẩm" value={search} onChange={(e) => {
                                     dispatch(setSearch(e.target.value));
-                                }}/>
+                                }} />
 
                                 {/* search history */}
                                 <div className="header-search-history">
@@ -236,26 +252,11 @@ export default function HeaderComponent({ onLogin, onRegister, fullName, onHome,
                         </div>
                         <div className="header-cart">
                             <i className="header-cart-icon fa-solid fa-cart-shopping header-cart-wrap" onClick={() => router.push("/cart")}>
-                               {count>0 &&  <p className="header-cart-quantity" >{count}</p>}
+                                {count > 0 && <p className="header-cart-quantity" >{count}</p>}
                             </i>
-                            
                         </div>
                     </div>
                 </div>
-                {/* <ul className="header-sort-bar">
-                         <li className="header-sort-item">
-                         <a href="" className="header-sort-link">Liên quan</a>
-                         </li>
-                         <li className="header-sort-item header-sort-item-active">
-                         <a href="" className="header-sort-link ">Mới nhất</a>
-                         </li>
-                         <li className="header-sort-item">
-                         <a href="" className="header-sort-link">Bán chạy</a>
-                         </li>
-                         <li className="header-sort-item">
-                         <a href="" className="header-sort-link">Giá</a>
-                         </li>
-                    </ul> */}
             </div>
         </>
     );
