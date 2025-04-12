@@ -9,7 +9,8 @@ import { setIsLogin, setToken, setUser } from "@/store/slices/authSlice";
 import { Value } from "sass";
 import { setCount, setSearch } from "@/store/slices/productsSlice";
 import Link from "next/link";
-export default function HeaderComponent({ onLogin, onRegister, fullName, onHome, isHome, onSearch, search }: { onLogin?: any; onRegister?: any; fullName?: string; onHome?: () => void; isHome?: boolean; onSearch?: () => void; search?: string; }) {
+export default function HeaderComponent({ onLogin, onRegister, fullName, onHome, isHome, onSearch, search }: { onLogin?: any; onRegister?: any; fullName?: string; onHome?: () => void; isHome?: boolean; onSearch?: (value: string) => void;
+     search?: string; }) {
     const router = useRouter();
     const { isLogin, user, token, count } = useSelector((state: any) => ({
         isLogin: state.auth.isLogin, // false
@@ -18,6 +19,8 @@ export default function HeaderComponent({ onLogin, onRegister, fullName, onHome,
         count: state.product.count
     }))
     const dispatch = useDispatch();
+    const [searchInput, setSearchInput] = useState(search || "");
+
     const handleBack = () => {
         if (window.history.length > 1) {
             router.back();
@@ -70,6 +73,18 @@ export default function HeaderComponent({ onLogin, onRegister, fullName, onHome,
                 console.error("Lỗi khi logout:", error);
                 alert("Đăng xuất thất bại!");
             });
+    };
+    const handleSearch = () => {
+        dispatch(setSearch(searchInput));
+        onSearch?.(searchInput);
+        setSearchInput("");
+      };
+      
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === "Enter") {
+            handleSearch();
+        }
     };
 
     useEffect(() => {
@@ -159,27 +174,27 @@ export default function HeaderComponent({ onLogin, onRegister, fullName, onHome,
                                     Trợ giúp
                                 </li>
                                 {isLogin && token != '' ? (
-                                   <li className="header-cover-li-a header-cover-li-strong">
-                                   <div className="header-user-dropdown">
-                                     <div className="header-user-info">
-                                       <img
-                                        //   src="http://127.0.0.1:8000/storage/images/avatar.jpg"
-                                         alt="avatar"
-                                         className="user-avatar"
-                                       />
-                                       <span className="username">Xin chào {user?.email}</span>
-                                     </div>
-                                     <ul className="user-dropdown-menu">
-                                       <li>
-                                         <Link href="/his"><i className="fa-solid fa-cart-shopping"></i>Đơn hàng của bạn</Link>
-                                       </li>
-                                       <li onClick={handlerLogout}>
-                                         <span><i className="fa-solid fa-right-from-bracket"></i>Đăng xuất</span>
-                                       </li>
-                                     </ul>
-                                   </div>
-                                 </li>
-                                 
+                                    <li className="header-cover-li-a header-cover-li-strong">
+                                        <div className="header-user-dropdown">
+                                            <div className="header-user-info">
+                                                <img
+                                                    src="http://127.0.0.1:8000/storage/images/avatar.jpg"
+                                                    alt="avatar"
+                                                    className="user-avatar"
+                                                />
+                                                <span className="username">Xin chào {user?.email}</span>
+                                            </div>
+                                            <ul className="user-dropdown-menu">
+                                                <li>
+                                                    <Link href="/his"><i className="fa-solid fa-cart-shopping"></i>Đơn hàng của bạn</Link>
+                                                </li>
+                                                <li onClick={handlerLogout}>
+                                                    <span><i className="fa-solid fa-right-from-bracket"></i>Đăng xuất</span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </li>
+
                                 ) : (
                                     <>
                                         <li className="header-cover-li-a header-cover-li-strong" onClick={onRegister}>
@@ -204,9 +219,15 @@ export default function HeaderComponent({ onLogin, onRegister, fullName, onHome,
                         <input type="checkbox" hidden id="mobile-search-checkbox" className="header-search-checkbox " />
                         <div className="header-search">
                             <div className="header-search-input-wrap">
-                                <input type="text" className="header-search-input" placeholder="Nhập để tìm kiếm sản phẩm" value={search} onChange={(e) => {
-                                    dispatch(setSearch(e.target.value));
-                                }} />
+                                <input
+                                    type="text"
+                                    className="header-search-input"
+                                    placeholder="Nhập để tìm kiếm sản phẩm"
+                                    value={searchInput}
+                                    onChange={(e) => setSearchInput(e.target.value)}
+                                    onKeyDown={handleKeyDown}
+                                />
+
 
                                 {/* search history */}
                                 <div className="header-search-history">
@@ -246,9 +267,10 @@ export default function HeaderComponent({ onLogin, onRegister, fullName, onHome,
                                     </li>
                                 </ul>
                             </div>
-                            <button className="header-search-btn">
-                                <i className="header-search-btn-icon fa-solid fa-magnifying-glass" onClick={onSearch}></i>
+                            <button className="header-search-btn" onClick={handleSearch}>
+                                <i className="header-search-btn-icon fa-solid fa-magnifying-glass"></i>
                             </button>
+
                         </div>
                         <div className="header-cart">
                             <i className="header-cart-icon fa-solid fa-cart-shopping header-cart-wrap" onClick={() => router.push("/cart")}>

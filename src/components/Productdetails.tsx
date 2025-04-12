@@ -161,8 +161,13 @@ export const ProdDetail: React.FC<Props> = ({ onBack, idProduct }) => {
 
   useEffect(() => {
     const el = document.querySelector(".product-container");
-    if (el) el.scrollIntoView({ behavior: "smooth" });
+    if (el) {
+      const headerHeight = 110;
+      const y = el.getBoundingClientRect().top + window.scrollY - headerHeight;
+      window.scrollTo({ top: y, behavior: "smooth" });
+    }
   }, [product]);
+  
 
   useEffect(() => {
     setSelected(selectAll);

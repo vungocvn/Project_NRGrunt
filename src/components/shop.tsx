@@ -58,7 +58,7 @@ export default function Shop() {
     function isValidEmail(email: string) {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(email);
-      }      
+    }
     // Forgot Password modal toggling
     function openForgotModalHandler() {
         // Close the login/register modal if open
@@ -77,11 +77,13 @@ export default function Shop() {
         sortOder,
         sort_col,
         pageIndex,
+        name, // ✅ thêm tham số name
     }: {
         id_category?: number;
         sortOder?: string;
         sort_col?: string;
         pageIndex?: number;
+        name?: string; // ✅ thêm kiểu name
     }) {
         const currentPage = pageIndex || total.pageIndex;
         dispatch(setDataProduct([]));
@@ -96,20 +98,22 @@ export default function Shop() {
                         id_category,
                         sort_order: sortOder,
                         sort_col,
-                        name: search,
+                        name: name ?? search, // ✅ ưu tiên name truyền vào, fallback dùng redux
                     },
                 })
                 .then((res) => {
                     if (res.data.status === 200) {
                         const items = res.data.data.items;
-                        if (search && items.length === 0) {
+
+                        if ((name ?? search) && items.length === 0) {
                             toast.info("Không tìm thấy sản phẩm nào phù hợp!", {
                                 position: "top-center",
                                 autoClose: 3000,
                                 className: "custom-toast",
-                                progressClassName: "custom-progress"
+                                progressClassName: "custom-progress",
                             });
                         }
+
                         dispatch(
                             setTotal({
                                 ...total,
@@ -181,7 +185,7 @@ export default function Shop() {
                     setSelectAuth(true);
                     setLogin({ ...login, email: register.email, password: register.password });
                 } else {
-                   toast.error("Sign up error, please try again!");
+                    toast.error("Sign up error, please try again!");
                 }
             })
             .catch((error) => {
@@ -216,23 +220,23 @@ export default function Shop() {
             toast.warn("Please enter your email and password!");
             return;
         }
-    
+
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(login.email)) {
             toast.warn("Please enter a valid email address!");
             return;
         }
-    
+
         try {
             dispatch(setLoading(true));
             openModelHandler(false);
-    
+
             const res = await axios.post("http://127.0.0.1:8000/api/auth/login", {
                 email: login.email,
                 password: login.password,
                 role: "Customer",
             });
-    
+
             if (res.data.status === 200) {
                 getCart();
                 const access_token = res.data.data["access_token"];
@@ -248,7 +252,7 @@ export default function Shop() {
         } catch (error: any) {
             if (error.response) {
                 const status = error.response.status;
-    
+
                 if (status === 401) {
                     toast.error("Incorrect email or password!");
                 } else if (status === 422) {
@@ -259,15 +263,15 @@ export default function Shop() {
             } else {
                 toast.error("Network error. Please check your connection.");
             }
-    
+
             console.error("Login error:", error);
         } finally {
             dispatch(setLoading(false));
         }
     };
-    
-    
-    
+
+
+
 
     // ========== Check Auth (on mount) ==========
     useEffect(() => {
@@ -331,11 +335,13 @@ export default function Shop() {
         <>
             <div className="container">
                 <HeaderComponent
-                    search={search}
-                    onSearch={() => {
-                        getAllProduct({ pageIndex: 1 });
-                        dispatch(setSearch(""));
+                    onSearch={(value: string) => {
+                        dispatch(setSearch(value));
+                        getAllProduct({ pageIndex: 1, name: value });
+                        
                     }}
+
+
                     onLogin={() => openModelHandler(true)}
                     onHome={() => {
                         dispatch(setLoading(true));
@@ -467,117 +473,122 @@ export default function Shop() {
             {/*=============================
                 MODAL FOR LOGIN/REGISTER
               ==============================*/}
-            <div className="modal" style={{ display: openModel ? "flex" : "none" }}>
-                <div className="modal-overlay"></div>
-                <div className="modal-body">
-                    {/* Authen form */}
-                    <div className="auth-form">
-                        <div className="auth-form-container">
-                            {selectAuth ? (
-                                <div className="auth-form-header">
-                                    <h3
-                                        className="auth-form-switch-btn"
-                                        onClick={() => {
-                                            setSelectAuth(true);
-                                        }}
-                                    >
-                                        Đăng nhập
-                                    </h3>
-                                    <span
-                                        className="auth-form-heading"
-                                        onClick={() => {
-                                            setSelectAuth(false);
-                                        }}
-                                    >
-                                        Đăng ký
-                                    </span>
-                                </div>
-                            ) : (
-                                <div className="auth-form-header">
-                                    <h3
-                                        className="auth-form-switch-btn"
-                                        onClick={() => setSelectAuth(false)}
-                                    >
-                                        Đăng ký
-                                    </h3>
-                                    <span
-                                        className="auth-form-heading"
-                                        onClick={() => {
-                                            setSelectAuth(true);
-                                        }}
-                                    >
-                                        Đăng nhập
-                                    </span>
-                                </div>
-                            )}
-
-                            {selectAuth
-                                ? formLogin({
-                                    email: login.email,
-                                    password: login.password,
-                                    setEmail: (e) => {
-                                        setLogin({ ...login, email: e.target.value });
-                                    },
-                                    setPassword: (e) => {
-                                        setLogin({ ...login, password: e.target.value });
-                                    },
-                                    openForgotModalHandler: openForgotModalHandler,
-                                })
-                                : formRegister({
-                                    name: register.name,
-                                    email: register.email,
-                                    password: register.password,
-                                    setName: (e) => {
-                                        setRegister({ ...register, name: e.target.value });
-                                    },
-                                    setEmail: (e) => {
-                                        setRegister({ ...register, email: e.target.value });
-                                    },
-                                    setPassword: (e) => {
-                                        setRegister({ ...register, password: e.target.value });
-                                    },
-                                })}
-
-                            <div className="auth-form-aside">
-                                <p className="auth-form-policy-text">
-                                    Bằng việc đăng ký, bạn đã đồng ý với NRGrunt về
-                                    <a href="" className="auth-form-policy-link">
-                                        {" "}
-                                        Điều khoản dịch vụ
-                                    </a>{" "}
-                                    &
-                                    <a href="" className="auth-form-policy-link">
-                                        {" "}
-                                        Chính sách bảo mật
-                                    </a>
-                                </p>
-                            </div>
-
-                            <div className="auth-form-controls">
+            {openModel && (
+                <div
+                    className="modal"
+                    style={{
+                        display: "flex",
+                        zIndex: 10001,
+                        position: "fixed",
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                    }}
+                >
+                    <div
+                        className="modal-overlay"
+                        style={{
+                            position: "absolute",
+                            width: "100%",
+                            height: "100%",
+                            backgroundColor: "rgba(0, 0, 0, 0.4)",
+                        }}
+                        onClick={() => setOpenModel(false)}
+                    ></div>
+                    <div className="modal-body">
+                        {/* Authen form */}
+                        <div className="auth-form">
+                            <div className="auth-form-container">
                                 {selectAuth ? (
-                                    <button className="btn btn-primary" onClick={handleLogin}>
-                                        Đăng nhập
-                                    </button>
+                                    <div className="auth-form-header">
+                                        <h3 className="auth-form-switch-btn" onClick={() => setSelectAuth(true)}>
+                                            Đăng nhập
+                                        </h3>
+                                        <span className="auth-form-heading" onClick={() => setSelectAuth(false)}>
+                                            Đăng ký
+                                        </span>
+                                    </div>
                                 ) : (
-                                    <button className="btn btn-primary" onClick={handleRegister}>
-                                        Đăng ký
-                                    </button>
+                                    <div className="auth-form-header">
+                                        <h3 className="auth-form-switch-btn" onClick={() => setSelectAuth(false)}>
+                                            Đăng ký
+                                        </h3>
+                                        <span className="auth-form-heading" onClick={() => setSelectAuth(true)}>
+                                            Đăng nhập
+                                        </span>
+                                    </div>
                                 )}
+
+                                {selectAuth
+                                    ? formLogin({
+                                        email: login.email,
+                                        password: login.password,
+                                        setEmail: (e) => {
+                                            setLogin({ ...login, email: e.target.value });
+                                        },
+                                        setPassword: (e) => {
+                                            setLogin({ ...login, password: e.target.value });
+                                        },
+                                        openForgotModalHandler: openForgotModalHandler,
+                                    })
+                                    : formRegister({
+                                        name: register.name,
+                                        email: register.email,
+                                        password: register.password,
+                                        setName: (e) => {
+                                            setRegister({ ...register, name: e.target.value });
+                                        },
+                                        setEmail: (e) => {
+                                            setRegister({ ...register, email: e.target.value });
+                                        },
+                                        setPassword: (e) => {
+                                            setRegister({ ...register, password: e.target.value });
+                                        },
+                                    })}
+
+                                <div className="auth-form-aside">
+                                    <p className="auth-form-policy-text">
+                                        Bằng việc đăng ký, bạn đã đồng ý với NRGrunt về
+                                        <a href="" className="auth-form-policy-link">
+                                            {" "}
+                                            Điều khoản dịch vụ
+                                        </a>{" "}
+                                        &
+                                        <a href="" className="auth-form-policy-link">
+                                            {" "}
+                                            Chính sách bảo mật
+                                        </a>
+                                    </p>
+                                </div>
+
+                                <div className="auth-form-controls">
+                                    {selectAuth ? (
+                                        <button className="btn btn-primary" onClick={handleLogin}>
+                                            Đăng nhập
+                                        </button>
+                                    ) : (
+                                        <button className="btn btn-primary" onClick={handleRegister}>
+                                            Đăng ký
+                                        </button>
+                                    )}
+                                </div>
                             </div>
+                            <i
+                                className="cancel-icon fa-solid fa-xmark"
+                                onClick={() => setOpenModel(false)}
+                            ></i>
                         </div>
-                        <i
-                            className="cancel-icon fa-solid fa-xmark"
-                            onClick={() => openModelHandler(true)}
-                        ></i>
                     </div>
                 </div>
-            </div>
+            )}
+
             <ForgotPasswordModal
                 isOpen={openForgotModal}
                 onClose={() => setOpenForgotModal(false)}
                 openLoginModal={() => {
-                    setSelectAuth(true);   
-                    setOpenModel(true);      
+                    setSelectAuth(true);
+                    setOpenModel(true);
                 }}
             />
             {isLoading && <LoadingScreen />}
@@ -586,7 +597,7 @@ export default function Shop() {
 }
 
 const formLogin = ({
-    
+
     email,
     password,
     setEmail,
