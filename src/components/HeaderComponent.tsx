@@ -9,8 +9,10 @@ import { setIsLogin, setToken, setUser } from "@/store/slices/authSlice";
 import { Value } from "sass";
 import { setCount, setSearch } from "@/store/slices/productsSlice";
 import Link from "next/link";
-export default function HeaderComponent({ onLogin, onRegister, fullName, onHome, isHome, onSearch, search }: { onLogin?: any; onRegister?: any; fullName?: string; onHome?: () => void; isHome?: boolean; onSearch?: (value: string) => void;
-     search?: string; }) {
+export default function HeaderComponent({ onLogin, onRegister, fullName, onHome, isHome, onSearch, search }: {
+    onLogin?: any; onRegister?: any; fullName?: string; onHome?: () => void; isHome?: boolean; onSearch?: (value: string) => void;
+    search?: string;
+}) {
     const router = useRouter();
     const { isLogin, user, token, count } = useSelector((state: any) => ({
         isLogin: state.auth.isLogin, // false
@@ -75,17 +77,41 @@ export default function HeaderComponent({ onLogin, onRegister, fullName, onHome,
             });
     };
     const handleSearch = () => {
+        if (!searchInput.trim()) return;
+
         dispatch(setSearch(searchInput));
         onSearch?.(searchInput);
+
+        // Lưu vào localStorage
+        const history = JSON.parse(localStorage.getItem("search_history") || "[]");
+        const updated = [searchInput, ...history.filter((item: string) => item !== searchInput)].slice(0, 5);
+        localStorage.setItem("search_history", JSON.stringify(updated));
+        setSearchHistory(updated);
+
         setSearchInput("");
-      };
-      
+        setShowHistory(false);
+    };
+
+    const handleKeywordClick = (keyword: string) => {
+        setSearchInput(keyword);
+        dispatch(setSearch(keyword));
+        onSearch?.(keyword);
+    };
+
+
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === "Enter") {
             handleSearch();
         }
     };
+    const [searchHistory, setSearchHistory] = useState<string[]>([]);
+    const [showHistory, setShowHistory] = useState(false);
+
+    useEffect(() => {
+        const stored = JSON.parse(localStorage.getItem("search_history") || "[]");
+        setSearchHistory(stored);
+    }, []);
 
     useEffect(() => {
         if (token && token !== "") {
@@ -224,32 +250,58 @@ export default function HeaderComponent({ onLogin, onRegister, fullName, onHome,
                                     className="header-search-input"
                                     placeholder="Nhập để tìm kiếm sản phẩm"
                                     value={searchInput}
-                                    onChange={(e) => setSearchInput(e.target.value)}
+                                    onChange={(e) => {
+                                        setSearchInput(e.target.value);
+                                        setShowHistory(true);
+                                    }}
+                                    onFocus={() => setShowHistory(true)}
                                     onKeyDown={handleKeyDown}
                                 />
+                                {showHistory && searchHistory.length > 0 && (
+                                    <div className="header-search-history">
+                                        <div
+                                            style={{
+                                                display: "flex",
+                                                justifyContent: "space-between",
+                                                alignItems: "center",
+                                                padding: "0 12px",
+                                            }}
+                                        >
+                                            <h3 className="header-search-history-heading">Lịch sử tìm kiếm</h3>
+                                            <button
+                                                onMouseDown={(e) => e.preventDefault()} 
+                                                onClick={() => {
+                                                    localStorage.setItem("search_history", JSON.stringify([]));
+                                                    setSearchHistory([]);
+                                                }}
+                                                style={{
+                                                    background: "none",
+                                                    border: "none",
+                                                    color: "#888",
+                                                    fontSize: "0.85rem",
+                                                    cursor: "pointer",
+                                                }}
+                                            >
+                                                Xoá
+                                            </button>
+
+                                        </div>
+
+                                        <ul className="header-search-history-list">
+                                            {searchHistory.map((item, index) => (
+                                                <li
+                                                    key={index}
+                                                    className="header-search-history-item"
+                                                    onClick={() => handleKeywordClick(item)}
+                                                >
+                                                    <a>{item}</a>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
 
 
-                                {/* search history */}
-                                <div className="header-search-history">
-                                    <h3 className="header-search-history-heading">Lịch sử tìm kiếm</h3>
-                                    <ul className="header-search-history-list">
-                                        <li className="header-search-history-item">
-                                            <a href="">Sữa rửa mặt</a>
-                                        </li>
-                                        <li className="header-search-history-item">
-                                            <a href="">Kem dưỡng</a>
-                                        </li>
-                                        <li className="header-search-history-item">
-                                            <a href="">Son môi</a>
-                                        </li>
-                                        <li className="header-search-history-item">
-                                            <a href="">Dầu dưỡng tóc</a>
-                                        </li>
-                                        <li className="header-search-history-item">
-                                            <a href="">Serum</a>
-                                        </li>
-                                    </ul>
-                                </div>
                             </div>
 
                             <div className="header-search-select">

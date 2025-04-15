@@ -77,13 +77,13 @@ export default function Shop() {
         sortOder,
         sort_col,
         pageIndex,
-        name, // ✅ thêm tham số name
+        name,
     }: {
         id_category?: number;
         sortOder?: string;
         sort_col?: string;
         pageIndex?: number;
-        name?: string; // ✅ thêm kiểu name
+        name?: string;
     }) {
         const currentPage = pageIndex || total.pageIndex;
         dispatch(setDataProduct([]));
@@ -98,21 +98,24 @@ export default function Shop() {
                         id_category,
                         sort_order: sortOder,
                         sort_col,
-                        name: name ?? search, // ✅ ưu tiên name truyền vào, fallback dùng redux
+                        name: name ?? search,
                     },
                 })
                 .then((res) => {
                     if (res.data.status === 200) {
                         const items = res.data.data.items;
 
-                        if ((name ?? search) && items.length === 0) {
-                            toast.info("Không tìm thấy sản phẩm nào phù hợp!", {
+                        const keyword = name ?? search;
+
+                        if (keyword && items.length === 0) {
+                            toast.info(`Không tìm thấy sản phẩm nào phù hợp với "${keyword}"!`, {
                                 position: "top-center",
                                 autoClose: 3000,
                                 className: "custom-toast",
-                                progressClassName: "custom-progress",
+                                progressClassName: "custom-progress"
                             });
                         }
+
 
                         dispatch(
                             setTotal({
@@ -338,19 +341,21 @@ export default function Shop() {
                     onSearch={(value: string) => {
                         dispatch(setSearch(value));
                         getAllProduct({ pageIndex: 1, name: value });
-                        
+
                     }}
 
 
                     onLogin={() => openModelHandler(true)}
                     onHome={() => {
+                        dispatch(setSearch(""));
                         dispatch(setLoading(true));
                         setTimeout(() => {
-                            getAllProduct({});
-                        }, 1500);
+                            getAllProduct({ name: "" });
+                        }, 100);
                         setSelectCategory(null);
                         setSelectedProd(null);
                     }}
+
                     isHome={true}
                     onRegister={() => openModelHandler(false)}
                 />
@@ -363,7 +368,8 @@ export default function Shop() {
                                     <span
                                         className="menu-li"
                                         onClick={() => {
-                                            getAllProduct({});
+                                            dispatch(setSearch(""));
+                                            getAllProduct({ name: "" }); // clear search
                                             setSelectCategory(null);
                                         }}
                                     >
@@ -380,7 +386,8 @@ export default function Shop() {
                                                 key={item.id}
                                                 className="menu-li"
                                                 onClick={() => {
-                                                    getAllProduct({ id_category: item.id });
+                                                    dispatch(setSearch(""));
+                                                    getAllProduct({ id_category: item.id, name: "" }); // clear search
                                                     setSelectCategory(item.id);
                                                 }}
                                             >
@@ -468,6 +475,7 @@ export default function Shop() {
                         )}
                     </div>
                 </div>
+
             </div>
 
             {/*=============================

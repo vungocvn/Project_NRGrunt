@@ -9,18 +9,26 @@ import "@/styles/forgot.css";
 import "@/styles/history.css";
 import type { AppProps } from "next/app";
 import { ReduxProvider } from "@/store/provider";
-import {FooterComponents} from "@/components/FooterComponents";
+import { FooterComponents } from "@/components/FooterComponents";
 import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css'; 
+import 'react-toastify/dist/ReactToastify.css';
+import { useRouter } from "next/router";
+
 export default function App({ Component, pageProps }: AppProps) {
+  const router = useRouter();
+  const isHomePage = router.pathname === "/"; 
+
   return (
     <ReduxProvider>
       <div className="layout-wrapper">
-        <Component {...pageProps} />
+        {/* Nội dung chính */}
+        <div className={isHomePage ? "" : "layout-content-with-margin"}>
+          <Component {...pageProps} />
+        </div>
+
         <ToastContainer />
         <FooterComponents />
       </div>
     </ReduxProvider>
   );
 }
-

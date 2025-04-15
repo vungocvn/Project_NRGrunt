@@ -24,7 +24,7 @@ export const Sorting:React.FC<Props> = ({onTrending, onNew, onSortPrice, page,on
                     </select>
                 </div>
             </div>
-            <div className="">
+            <div className="pag-navigation" style={{padding: '10px'}}>
                 <button onClick={onPrevPage}><i className=" fa-solid fa-angle-left"></i></button>
                 <span>{page ?? '1/1'}</span>
                 <button onClick={onNextPage}><i className=" fa-solid fa-angle-right"></i></button>
