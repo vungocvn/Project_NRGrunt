@@ -91,6 +91,7 @@
 .container .header-cover-right .header-cover-ul-one {
   list-style: none;
   display: flex;
+  gap: 4px;
   justify-content: end;
   align-items: center;
 }
@@ -462,7 +463,7 @@
   box-shadow: 0 14px 40px rgba(0, 0, 0, 0.12);
 }
 .container .body-container-silder h2 {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 700;
   color: #01ab78;
   margin-bottom: 20px;
@@ -543,7 +544,6 @@
 }
 .container .category-heading {
   font-size: 1.6rem;
-  padding-right: 60px;
   padding-top: 12px;
   padding-bottom: 12px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.117);
