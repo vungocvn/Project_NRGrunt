@@ -85,7 +85,7 @@
 }
 .container .header-cover-right {
   text-align: right;
-  width: 49%;
+  width: 50%;
   display: inline-block;
 }
 .container .header-cover-right .header-cover-ul-one {
@@ -93,7 +93,6 @@
   display: flex;
   justify-content: end;
   align-items: center;
-  gap: 15px;
 }
 .container .header-cover-right .header-cover-li-a {
   font-size: 14px;
@@ -106,6 +105,7 @@
 .container .header-cover-right .header-cover-li-a i {
   margin-right: 10px;
   font-size: 16px;
+  margin-top: 2px;
 }
 .container .header-cover-right .header-cover-li-a-notify {
   position: relative;
