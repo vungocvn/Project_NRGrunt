@@ -11,6 +11,11 @@ export default function OrderHistory() {
     final_total: number;
     is_paid: number;
     is_canceled: number;
+    user?: {
+      name?: string;
+      phone?: string;
+      address?: string;
+    };
   }
 
   const [orders, setOrders] = useState<Order[]>([]);
@@ -36,7 +41,9 @@ export default function OrderHistory() {
         },
       })
       .then((res) => {
-        setOrders(res.data);
+        // Nếu response có dạng { status: 200, data: [...] }
+        const data = res.data.data || res.data;
+        setOrders(data);
       })
       .catch((err) => {
         console.error("Lỗi khi lấy lịch sử đơn hàng:", err);
@@ -78,6 +85,9 @@ export default function OrderHistory() {
           <thead>
             <tr>
               <th>Mã đơn</th>
+              <th>Tên KH</th>
+              <th>SĐT</th>
+              <th>Địa chỉ</th>
               <th>Ngày đặt</th>
               <th>Tổng tiền</th>
               <th>Trạng thái</th>
@@ -91,6 +101,9 @@ export default function OrderHistory() {
               .map((order) => (
                 <tr key={order.id}>
                   <td>HD{order.id.toString().padStart(3, "0")}</td>
+                  <td>{order.user?.name || "Không rõ"}</td>
+                  <td>{order.user?.phone || "Không rõ"}</td>
+                  <td>{order.user?.address || "Không rõ"}</td>
                   <td>{new Date(order.created_at).toLocaleDateString()}</td>
                   <td>{formatVND(order.final_total)}</td>
                   <td>{getStatusText(order)}</td>

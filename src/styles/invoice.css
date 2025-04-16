@@ -32,18 +32,18 @@
 }
 
 .invoice {
-  padding: 20px;
+  padding: 30px;
   font-family: "Arial", sans-serif;
   background-color: #fff;
   border-radius: 10px;
   color: #000;
   max-width: 600px; 
-  margin: 90px auto;
+  margin: 130px auto;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .invoice-summary p {
-  text-align: right; /* Căn phải tổng tiền ship và thành tiền */
+  text-align: right; 
 }
 
 .invoice-summary h4 {
