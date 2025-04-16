@@ -369,7 +369,7 @@ export default function Shop() {
                                         className="menu-li"
                                         onClick={() => {
                                             dispatch(setSearch(""));
-                                            getAllProduct({ name: "" }); // clear search
+                                            getAllProduct({ name: "" }); 
                                             setSelectCategory(null);
                                         }}
                                     >
@@ -453,7 +453,7 @@ export default function Shop() {
                                 </div>
 
                                 <div
-                                    className="banner-image w-270 h-50"
+                                    className="banner-image h-50"
                                     style={{ marginTop: "20px", marginBottom: "20px" }}
                                 >
                                     <Banner />
