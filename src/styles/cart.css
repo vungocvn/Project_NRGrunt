@@ -28,8 +28,9 @@
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   width: 100%;
   max-width: 1000px;
-  margin-top: 100px !important;
+  margin-top: 112px !important;
   margin: auto;
+  border-radius: 8px;
 }
 .back-button{
   font-size: 20px;

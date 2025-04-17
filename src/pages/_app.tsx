@@ -9,7 +9,7 @@ import "@/styles/forgot.css";
 import "@/styles/history.css";
 import type { AppProps } from "next/app";
 import { ReduxProvider } from "@/store/provider";
-import { FooterComponents } from "@/components/FooterComponents";
+import  { FooterComponents } from "@/components/FooterCom";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useRouter } from "next/router";

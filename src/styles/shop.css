@@ -265,12 +265,8 @@
 }
 .container .header-with-search .header-search .header-search-select:hover .header-search-option {
   display: block;
-}
-.container .header-with-search .header-search .header-search-checkbox:checked ~ .header-search {
-  display: flex;
-}
-.container .header-with-search .header-search .header-search-select:hover .header-search-option {
-  display: block;
+  opacity: 1;
+  visibility: visible;
 }
 .container .header-with-search .header-search .header-search-option {
   position: absolute;
@@ -281,33 +277,34 @@
   box-shadow: 0 1px 2px #ccc;
   padding-left: 0;
   border-radius: 3px;
-  animation: fadeIn ease-in 0.2s;
-  display: none;
-}
-.container .header-with-search .header-search .header-search-option::after {
-  position: absolute;
-  content: "";
+  background-color: #fff;
   display: block;
-  width: 100%;
-  top: -12px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease;
+}
+.container .header-with-search .header-search .header-search-option::before {
+  content: "";
+  position: absolute;
+  top: -16px;
   left: 0;
+  width: 100%;
   height: 20px;
+  pointer-events: auto;
 }
 .container .header-with-search .header-search .header-search-option-item {
   background-color: #fff;
-  padding: 8px 8px;
+  padding: 8px;
 }
 .container .header-with-search .header-search .header-search-option-item:hover {
   cursor: pointer;
   background-color: #fafafa;
 }
 .container .header-with-search .header-search .header-search-option-item:first-child {
-  border-color: #fafafa;
   border-top-left-radius: 3px;
   border-top-right-radius: 3px;
 }
 .container .header-with-search .header-search .header-search-option-item:last-child {
-  border-color: #fafafa;
   border-bottom-left-radius: 3px;
   border-bottom-right-radius: 3px;
 }
@@ -331,7 +328,7 @@
 .container .header-with-search .header-search .header-search-select-icon {
   font-size: 0.9rem;
   color: #4A4A4A;
-  margin: 0px 16px 0 8px;
+  margin: 0 16px 0 8px;
   position: relative;
   top: 1px;
 }
@@ -537,10 +534,27 @@
   margin-top: 8px;
 }
 .container .price-filter select {
-  padding: 8px;
+  padding: 11px 16px;
   outline: none;
-  border-radius: 5px;
+  border-radius: 6px;
   margin-left: 10px;
+  font-size: 14px;
+  color: #333;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  transition: all 0.3s ease;
+}
+.container .price-filter select:hover {
+  background-color: #e6f9f3;
+  border-color: #01ab78;
+  cursor: pointer;
+}
+.container .price-filter select:focus {
+  border-color: #01ab78;
+  box-shadow: 0 0 0 2px rgba(1, 171, 120, 0.2);
+}
+.container .price-filter select option {
+  font-size: 14px;
 }
 .container .category-heading {
   font-size: 1.6rem;

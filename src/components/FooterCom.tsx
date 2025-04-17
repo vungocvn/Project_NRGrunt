@@ -1,6 +1,10 @@
-export default function Footer() {
+import * as React from 'react';
+type Props = {
+
+};
+
+export function FooterComponents(props: Props) {
     return (
-        <>
             <div className="footer">
                 <div className="gird">
                     <div className="gird-row">
@@ -102,6 +106,6 @@ export default function Footer() {
                     <p className="footer-text">© 2025 - Bản quyền thuộc về công ty Ngọc Vũ</p>
                 </div>
             </div>
-        </>
-    )
-}
+    );
+};
+export default FooterComponents;
