@@ -9,6 +9,7 @@ interface Props {
 }
 
 interface Productlist {
+    sold_quantity: number;
     id: number;
     name: string;
     status: number;
@@ -103,7 +104,7 @@ const renderItem = (
                                 <i className="fa-solid fa-star"></i>
                             </div>
                         </div>
-                        <div className="buy">Đã bán {item.quantity}</div>
+                        <div className="buy">Đã bán {item.sold_quantity ?? 0}</div>
                     </div>
                 </div>
                 <div className="content-below">

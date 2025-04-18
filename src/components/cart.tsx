@@ -105,27 +105,16 @@ export const Cart: React.FC<Props> = ({ onBack, setNotify }) => {
     try {
       const token = Cookies.get("token_portal");
   
-      await axios.put(
-        "http://127.0.0.1:8000/api/users/profile",
-        { name, phone, address, email: null, role: null },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
-      );
-  
       const payload = {
         cart_ids: selectedItems.map((item) => item.id),
         total_price: totalPrice,
         vat: vat,
         shipping_fee: shippingFee,
         final_total: finalTotal,
-        name,    
-        phone,
-        address
+        receiver_name: name,
+        receiver_phone: phone,
+        receiver_address: address
       };
-      
   
       const res = await axios.post(`http://127.0.0.1:8000/api/orders`, payload, {
         headers: {
@@ -152,6 +141,8 @@ export const Cart: React.FC<Props> = ({ onBack, setNotify }) => {
       alert("Có lỗi xảy ra khi đặt hàng!");
     }
   };
+  
+  
   
 
   useEffect(() => {

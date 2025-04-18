@@ -88,7 +88,10 @@ export const ProdDetail: React.FC<Props> = ({ onBack, idProduct }) => {
       toast.info("please login to buy!", { position: "top-center", autoClose: 3000 });
       return;
     }
-
+    if (product.quantity <= 0) {
+      toast.warning("Product is out of stock, cannot be added to cart!", { position: "top-center", autoClose: 3000 });
+      return;
+    }
     axios.post(`http://127.0.0.1:8000/api/carts`, { product_id: idProduct, quantity }, {
       headers: { Authorization: `Bearer ${token}` },
     })
@@ -144,8 +147,30 @@ export const ProdDetail: React.FC<Props> = ({ onBack, idProduct }) => {
             <span onClick={() => setQuantity(quantity + 1)} className="quantity-btn btn-two">+</span>
           </div>
           <div className="button-detail">
-            <button className="buy-now" onClick={() => addCart("buy")}>Mua Ngay</button>
-            <button className="add-to-cart" onClick={() => addCart("cart")}> <i className="fa-solid fa-cart-shopping"></i> Thêm Vào Giỏ </button>
+            {product.quantity > 0 ? (
+              <>
+                <button className="buy-now" onClick={() => addCart("buy")}>Mua Ngay</button>
+                <button className="add-to-cart" onClick={() => addCart("cart")}>
+                  <i className="fa-solid fa-cart-shopping"></i> Thêm Vào Giỏ
+                </button>
+              </>
+            ) : (
+              <button
+                className="out-of-stock"
+                style={{
+                  backgroundColor: "#ccc",
+                  color: "#666",
+                  padding: "10px 20px",
+                  borderRadius: "6px",
+                  border: "none",
+                  cursor: "not-allowed",
+                  fontWeight: "bold"
+                }}
+                disabled
+              >
+                Hết hàng
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -192,7 +217,7 @@ export const ProdDetail: React.FC<Props> = ({ onBack, idProduct }) => {
                 transition: "all 0.2s ease",
               }}
               onMouseOver={(e) =>
-                (e.currentTarget.style.backgroundColor = "#e0f7f2") 
+                (e.currentTarget.style.backgroundColor = "#e0f7f2")
               }
               onMouseOut={(e) =>
                 (e.currentTarget.style.backgroundColor = "transparent")

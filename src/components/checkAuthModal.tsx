@@ -32,41 +32,31 @@ export default function CheckoutModal({ onClose, onSubmit }: Props) {
   }, []);
   
   const handleSubmit = async () => {
-    console.log("token_portal", Cookies.get("token_portal"));
     if (!name || !phone || !address) {
       alert('Vui lòng nhập đầy đủ thông tin');
       return;
     }
-
+  
     const token = Cookies.get("token_portal");
     if (!token) {
       alert("Vui lòng đăng nhập để tiếp tục đặt hàng.");
       onClose(); 
       return;
     }
-
+  
     setLoading(true);
-
+  
     try {
-      await axios.put("http://127.0.0.1:8000/api/users/profile", {
-        name,
-        phone,
-        address,
-      }, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-
-      onSubmit({ name, phone, address });
+      // KHÔNG GỌI PUT profile nữa
+      onSubmit({ name, phone, address }); // Gửi dữ liệu người nhận cho đơn hàng
     } catch (err) {
-      console.error("Lỗi cập nhật thông tin:", err);
-      alert("Không thể cập nhật thông tin người dùng. Vui lòng đăng nhập lại.");
+      console.error("Lỗi:", err);
+      alert("Có lỗi xảy ra. Vui lòng thử lại.");
     }
-
+  
     setLoading(false);
   };
-
+  
   return (
     <div className="modal-overlay">
       <div className="modal-content">

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useDispatch } from "react-redux";
 import { setCount } from "@/store/slices/productsSlice";
-import "@/styles/invoice.css"; // ⬅ nếu chưa có import thì thêm vào
+import "@/styles/invoice.css";
 import HeaderComponent from "@/components/HeaderComponent";
 
 export default function InvoicePage() {
@@ -39,17 +39,17 @@ export default function InvoicePage() {
 
                 setBill({
                     ...invoice,
-                    vat: invoice.vat,                  
-                    shipping_fee: invoice.shipping_fee, 
-                    final_total: invoice.final_total,   
+                    vat: invoice.vat,
+                    shipping_fee: invoice.shipping_fee,
+                    final_total: invoice.final_total,
                     details,
                     customer_info: {
-                      name: invoice.user?.name ?? "Không rõ",
-                      phone: invoice.user?.phone ?? "Không rõ",
-                      address: invoice.user?.address ?? "Không rõ",
-                    },
-                  });
-                  
+                        name: invoice.receiver_name || invoice.user?.name || "Không rõ",
+                        phone: invoice.receiver_phone || invoice.user?.phone || "Không rõ",
+                        address: invoice.receiver_address || invoice.user?.address || "Không rõ",
+                    }
+                });
+
             } catch (error) {
                 console.error("Lỗi khi lấy hóa đơn:", error);
             }
@@ -69,9 +69,9 @@ export default function InvoicePage() {
     if (!bill) return <p>Đang tải hóa đơn...</p>;
 
     return (
-        <div className="container">  
-        <HeaderComponent/>
-        <div className="invoice" style={{ padding: "30px", maxWidth: "800px", margin: "120px auto" }}>
+        <div className="container">
+            <HeaderComponent />
+            <div className="invoice" style={{ padding: "30px", maxWidth: "800px", margin: "120px auto" }}>
                 <h2 style={{ textAlign: "center", color: "#01ab78" }}>HÓA ĐƠN THANH TOÁN</h2>
 
                 <div className="customer-info" style={{ marginBottom: "20px" }}>
@@ -107,12 +107,29 @@ export default function InvoicePage() {
                 </div>
 
                 <div style={{ textAlign: "center", marginTop: 30 }}>
-                    <button onClick={() => {
-                        localStorage.removeItem("cart");
-                        Cookies.set("cart_count", "0");
-                        dispatch(setCount(0));
-                        router.push("/shop").then(() => window.location.reload());
-                    }}
+                    <button
+                        onClick={() => {
+                            if (window.history.length > 2) {
+                                router.back(); // quay lại trang lịch sử
+                            } else {
+                                router.push("/his");
+                            }
+                        }}
+                        style={{
+                            padding: "10px 20px", backgroundColor: "#ccc", color: "#000",
+                            border: "none", borderRadius: "4px", cursor: "pointer", marginRight: "10px"
+                        }}
+                    >
+                        Quay lại lịch sử
+                    </button>
+
+                    <button
+                        onClick={() => {
+                            localStorage.removeItem("cart");
+                            Cookies.set("cart_count", "0");
+                            dispatch(setCount(0));
+                            router.push("/shop").then(() => window.location.reload());
+                        }}
                         style={{
                             padding: "10px 20px", backgroundColor: "#01ab78", color: "white",
                             border: "none", borderRadius: "4px", cursor: "pointer"
@@ -123,6 +140,5 @@ export default function InvoicePage() {
                 </div>
             </div>
         </div>
-
     );
 }
