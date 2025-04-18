@@ -123,6 +123,9 @@ export const Cart: React.FC<Props> = ({ onBack, setNotify }) => {
       });
   
       if (res.data.status === 200 || res.data.status === 201) {
+        localStorage.removeItem("cart");
+        Cookies.set("cart_count", "0");
+        dispatch(setCount(0));
         const orderData = {
           ...res.data.data,
           customer_info: {
@@ -141,10 +144,6 @@ export const Cart: React.FC<Props> = ({ onBack, setNotify }) => {
       alert("Có lỗi xảy ra khi đặt hàng!");
     }
   };
-  
-  
-  
-
   useEffect(() => {
     getCart();
   }, []);

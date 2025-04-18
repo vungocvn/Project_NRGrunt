@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 import "@/styles/reponsive.css";
 import Cookies from "js-cookie";
 
-import { ChangeEventHandler, use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { setIsLogin, setToken, setUser } from "@/store/slices/authSlice";
