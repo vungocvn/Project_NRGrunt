@@ -23,6 +23,27 @@ export default function InvoicePage() {
     };
 
     useEffect(() => {
+        localStorage.removeItem("cart");
+        localStorage.removeItem("cart_step");
+        Cookies.set("cart_count", "0");
+        dispatch(setCount(0));
+
+        const token = Cookies.get("token_portal");
+        if (token) {
+            axios.get("http://127.0.0.1:8000/api/carts", {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }).then(res => {
+                const remaining = res.data?.data?.length || 0;
+                dispatch(setCount(remaining));
+            }).catch(err => {
+                console.error("Không lấy được giỏ hàng sau khi đặt:", err);
+            });
+        }
+    }, []);
+
+    useEffect(() => {
         if (!id) return;
 
         const fetchData = async () => {
@@ -110,7 +131,7 @@ export default function InvoicePage() {
                     <button
                         onClick={() => {
                             if (window.history.length > 2) {
-                                router.back(); // quay lại trang lịch sử
+                                router.back();
                             } else {
                                 router.push("/his");
                             }
@@ -125,18 +146,20 @@ export default function InvoicePage() {
 
                     <button
                         onClick={() => {
-                            localStorage.removeItem("cart");
-                            Cookies.set("cart_count", "0");
-                            dispatch(setCount(0));
-                            router.push("/shop").then(() => window.location.reload());
+                            router.push("/shop");
                         }}
                         style={{
-                            padding: "10px 20px", backgroundColor: "#01ab78", color: "white",
-                            border: "none", borderRadius: "4px", cursor: "pointer"
+                            padding: "10px 20px",
+                            backgroundColor: "#01ab78",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "4px",
+                            cursor: "pointer"
                         }}
                     >
                         Tiếp tục mua sắm
                     </button>
+
                 </div>
             </div>
         </div>

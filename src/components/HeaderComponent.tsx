@@ -24,12 +24,18 @@ export default function HeaderComponent({ onLogin, onRegister, fullName, onHome,
     const [searchInput, setSearchInput] = useState(search || "");
 
     const handleBack = () => {
-        if (window.history.length > 1) {
-            router.back();
+        const prev = document.referrer;
+      
+        if (prev.includes("/cart") || prev.includes("/invoice")) {
+          // nếu đến từ trang đặt hàng hoặc giỏ hàng thì quay về shop thay vì back
+          router.push("/shop");
+        } else if (window.history.length > 1) {
+          router.back();
         } else {
-            router.push("/shop");
+          router.push("/shop");
         }
-    };
+      };
+      
     const forceLogout = (message = "Bạn đã đăng xuất") => {
         Cookies.remove("token_portal");
         dispatch(setIsLogin(false));
