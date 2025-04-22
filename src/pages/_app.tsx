@@ -7,6 +7,7 @@ import "@/styles/invoice.css";
 import "@/styles/globals.css";
 import "@/styles/forgot.css";
 import "@/styles/history.css";
+import "@/styles/logout.css";
 import type { AppProps } from "next/app";
 import { ReduxProvider } from "@/store/provider";
 import  { FooterComponents } from "@/components/FooterCom";

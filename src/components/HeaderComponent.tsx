@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import "@/styles/reponsive.css";
 import Cookies from "js-cookie";
-
+import LogoutModalClient from "@/components/LogoutModalClient";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
@@ -14,6 +14,7 @@ export default function HeaderComponent({ onLogin, onRegister, fullName, onHome,
     search?: string;
 }) {
     const router = useRouter();
+    const [showLogoutModal, setShowLogoutModal] = useState(false);
     const { isLogin, user, token, count } = useSelector((state: any) => ({
         isLogin: state.auth.isLogin, // false
         user: state.auth.user,
@@ -25,17 +26,17 @@ export default function HeaderComponent({ onLogin, onRegister, fullName, onHome,
 
     const handleBack = () => {
         const prev = document.referrer;
-      
+
         if (prev.includes("/cart") || prev.includes("/invoice")) {
-          // nếu đến từ trang đặt hàng hoặc giỏ hàng thì quay về shop thay vì back
-          router.push("/shop");
+            // nếu đến từ trang đặt hàng hoặc giỏ hàng thì quay về shop thay vì back
+            router.push("/shop");
         } else if (window.history.length > 1) {
-          router.back();
+            router.back();
         } else {
-          router.push("/shop");
+            router.push("/shop");
         }
-      };
-      
+    };
+
     const forceLogout = (message = "Bạn đã đăng xuất") => {
         Cookies.remove("token_portal");
         dispatch(setIsLogin(false));
@@ -47,9 +48,6 @@ export default function HeaderComponent({ onLogin, onRegister, fullName, onHome,
     };
 
     const handlerLogout = () => {
-        const isConfirmed = window.confirm("Bạn có chắc chắn muốn đăng xuất không?");
-        if (!isConfirmed) return;
-
         const token = Cookies.get("token_portal");
         if (!token) {
             forceLogout("Token không tồn tại");
@@ -57,31 +55,21 @@ export default function HeaderComponent({ onLogin, onRegister, fullName, onHome,
         }
 
         axios
-            .post(
-                "http://127.0.0.1:8000/api/auth/logout",
-                {},
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
+            .post("http://127.0.0.1:8000/api/auth/logout", {}, {
+                headers: {
+                    Authorization: `Bearer ${token}`
                 }
-            )
+            })
             .then((response) => {
                 console.log("Logout response:", response.data);
-
-                if (response.status === 401) {
-                    alert("Phiên đăng nhập đã hết hạn. Tự động đăng xuất!");
-                } else {
-                    alert("Đăng xuất thành công!");
-                }
-
                 forceLogout();
             })
             .catch((error) => {
                 console.error("Lỗi khi logout:", error);
-                alert("Đăng xuất thất bại!");
+                forceLogout("Đăng xuất thất bại (force)");
             });
     };
+
     const handleSearch = () => {
         if (!searchInput.trim()) return;
 
@@ -220,7 +208,7 @@ export default function HeaderComponent({ onLogin, onRegister, fullName, onHome,
                                                 <li>
                                                     <Link href="/his"><i className="fa-solid fa-cart-shopping"></i>Đơn hàng của bạn</Link>
                                                 </li>
-                                                <li onClick={handlerLogout}>
+                                                <li onClick={() => setShowLogoutModal(true)}                                                >
                                                     <span><i className="fa-solid fa-right-from-bracket"></i>Đăng xuất</span>
                                                 </li>
                                             </ul>
@@ -275,7 +263,7 @@ export default function HeaderComponent({ onLogin, onRegister, fullName, onHome,
                                         >
                                             <h3 className="header-search-history-heading">Lịch sử tìm kiếm</h3>
                                             <button
-                                                onMouseDown={(e) => e.preventDefault()} 
+                                                onMouseDown={(e) => e.preventDefault()}
                                                 onClick={() => {
                                                     localStorage.setItem("search_history", JSON.stringify([]));
                                                     setSearchHistory([]);
@@ -338,6 +326,16 @@ export default function HeaderComponent({ onLogin, onRegister, fullName, onHome,
                     </div>
                 </div>
             </div>
+            <LogoutModalClient
+                open={showLogoutModal}
+                onClose={() => setShowLogoutModal(false)}
+                onConfirm={() => {
+                    setShowLogoutModal(false);
+                    handlerLogout();
+                }}
+            />
+
         </>
+
     );
 }
