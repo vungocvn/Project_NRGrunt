@@ -85,7 +85,7 @@ export default function OrderHistory() {
     const token = Cookies.get("token_portal");
     if (!token) return;
 
-    if (!confirm("Bạn có chắc chắn muốn huỷ đơn hàng này?")) return;
+    if (!confirm("Are you sure you want to cancel this order?")) return;
 
     try {
       await axios.post(
@@ -101,10 +101,10 @@ export default function OrderHistory() {
       setOrders((prev) =>
         prev.map((o) => (o.id === orderId ? { ...o, is_canceled: 1 } : o))
       );
-      toast.success("Đơn hàng đã được huỷ thành công.");
+      toast.success("Order has been cancelled successfully.");
     } catch (error) {
-      console.error("Lỗi khi huỷ đơn hàng:", error);
-      toast.error("Không thể huỷ đơn hàng. Vui lòng thử lại sau.");
+      console.error("error in cancel order:", error);
+      toast.error("Order cannot be cancelled. Please try again later.");
     }
   };
 
@@ -138,7 +138,7 @@ export default function OrderHistory() {
             .filter(statusFilter)
             .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
             .map((order) => {
-              console.log(order); // ✅ debug dữ liệu
+              console.log(order);
               return (
                 <div
                   className="order-card"
@@ -165,7 +165,7 @@ export default function OrderHistory() {
                   <div className="order-footer">
                     <b>Thành tiền: {formatVND(order.final_total)}</b>
                     <div style={{ display: "flex", gap: "12px" }}>
-                      {!order.is_canceled && (
+                      {!order.is_canceled && !order.is_paid && (
                         <button
                           className="btn-cancel"
                           onClick={(e) => handleCancelOrder(e, order.id)}
