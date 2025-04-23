@@ -74,15 +74,87 @@
   border-radius: 2px;
 }
 
-/* .quantity-btn {
+/* modal */
+/* ✅ Đặt phía trên cùng hoặc cuối cùng cũng được, miễn là bên ngoài media */
 
-  color: white;
-  border: none;
+.delete-confirm-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.delete-confirm-modal {
+  background: white;
+  border-radius: 8px;
+  padding: 20px 24px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  max-width: 360px;
+  width: 100%;
+  text-align: center;
+  animation: fadeIn 0.3s ease;
+}
+
+.delete-confirm-modal h3 {
+  color: red;
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.delete-confirm-modal p {
+  margin-bottom: 20px;
+  font-size: 15px;
+  color: #333;
+}
+
+.delete-confirm-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.delete-confirm-buttons button {
   padding: 6px 12px;
-  border-radius: 5px;
+  border-radius: 4px;
+  font-weight: 500;
   cursor: pointer;
-  font-size: 16px;
-} */
+  border: none;
+  font-size: 14px;
+}
+
+.delete-confirm-buttons .cancel-btn {
+  background-color: #ddd;
+  color: #333;
+}
+
+.delete-confirm-buttons .cancel-btn:hover {
+  background-color: #ccc;
+}
+
+.delete-confirm-buttons .delete-btn {
+  background-color: red;
+  color: white;
+}
+
+.delete-confirm-buttons .delete-btn:hover {
+  background-color: darkred;
+}
+
+@keyframes fadeIn {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
 
 .quantity-btn.increase {
   background: var(--primary-color);
@@ -164,4 +236,18 @@
       text-align: center;
   }
 }
-  
+.cart-empty {
+  text-align: center;
+  padding: 50px 0;
+}
+
+.cart-empty-img {
+  width: 160px;
+  margin: 0 auto 20px;
+}
+
+.cart-empty-text {
+  font-size: 18px;
+  color: #555;
+}
+

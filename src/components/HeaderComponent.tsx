@@ -106,6 +106,32 @@ export default function HeaderComponent({ onLogin, onRegister, fullName, onHome,
         const stored = JSON.parse(localStorage.getItem("search_history") || "[]");
         setSearchHistory(stored);
     }, []);
+    useEffect(() => {
+        const fetchCartCount = async () => {
+            const token = Cookies.get("token_portal");
+            if (!token) return;
+
+            try {
+                const res = await axios.get("http://127.0.0.1:8000/api/carts", {
+                    params: { page: 1, page_size: 100 },
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+
+                if (res.data.status === 200) {
+                    dispatch(setCount(res.data.data.length));
+                }
+            } catch (error) {
+                console.error("Không thể lấy số lượng giỏ hàng:", error);
+            }
+        };
+
+        if (isLogin && token) {
+            fetchCartCount();
+        }
+    }, [isLogin, token]);
+
 
     useEffect(() => {
         if (token && token !== "") {

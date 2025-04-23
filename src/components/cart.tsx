@@ -6,6 +6,8 @@ import Cookies from "js-cookie";
 import { useDispatch, useSelector } from "react-redux";
 import { setCount } from "@/store/slices/productsSlice";
 import CheckoutModal from "@/components/checkAuthModal";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 interface Props {
   onBack: (product: any) => void;
@@ -32,12 +34,17 @@ export const Cart: React.FC<Props> = ({ onBack, setNotify }) => {
   const [showModal, setShowModal] = useState(false);
   const [selectedItems, setSelectedItems] = useState<CartItem[]>([]);
   const [selectAll, setSelectAll] = useState(false);
-
-  const { token } = useSelector((state: any) => ({
-    token: state.auth.token
+  const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
+  const [isLoadingCart, setIsLoadingCart] = useState(true);
+  const { token, isLogin } = useSelector((state: any) => ({
+    token: state.auth.token,
+    isLogin: state.auth.isLogin,
   }));
 
-  const totalPrice = selectedItems.reduce((sum, item) => sum + parseFloat(item.price) * item.quantity, 0);
+  const totalPrice = selectedItems.reduce(
+    (sum, item) => sum + parseFloat(item.price) * item.quantity,
+    0
+  );
 
   useEffect(() => {
     const vatAmount = totalPrice * 0.05;
@@ -45,7 +52,12 @@ export const Cart: React.FC<Props> = ({ onBack, setNotify }) => {
     setFinalTotal(totalPrice + vatAmount + shippingFee);
   }, [totalPrice, shippingFee]);
 
+  useEffect(() => {
+    if (token && isLogin) getCart();
+  }, [token, isLogin]);
+
   const getCart = () => {
+    setIsLoadingCart(true);
     const token = Cookies.get("token_portal") || "";
     axios
       .get(`http://127.0.0.1:8000/api/carts`, {
@@ -60,8 +72,10 @@ export const Cart: React.FC<Props> = ({ onBack, setNotify }) => {
           dispatch(setCount(res.data.data.length));
         }
       })
-      .catch((error) => console.log(error));
+      .catch((error) => console.log(error))
+      .finally(() => setIsLoadingCart(false));
   };
+
 
   const updateCart = (cart_id: number, product_id: number, quantity: number) => {
     axios
@@ -70,72 +84,65 @@ export const Cart: React.FC<Props> = ({ onBack, setNotify }) => {
         { product_id, quantity },
         {
           headers: {
-            Authorization: `Bearer ${Cookies.get("token_portal")}`
-          }
+            Authorization: `Bearer ${Cookies.get("token_portal")}`,
+          },
         }
       )
       .catch((error) => console.log(error));
   };
 
-  const updateQuantity = (id: number, delta: number, quantity: number, product_id: number) => {
+  const updateQuantity = (
+    id: number,
+    delta: number,
+    quantity: number,
+    product_id: number
+  ) => {
     const newQty = Math.max(1, quantity + delta);
-    setCartItems((prevItems) => prevItems.map((item) => (item.id === id ? { ...item, quantity: newQty } : item)));
+    setCartItems((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, quantity: newQty } : item))
+    );
     updateCart(id, product_id, newQty);
   };
 
   const deleteCart = (id: number) => {
     axios
       .delete(`http://127.0.0.1:8000/api/carts/${id}`, {
-        headers: {
-          Authorization: `Bearer ${Cookies.get("token_portal")}`
-        }
+        headers: { Authorization: `Bearer ${Cookies.get("token_portal")}` },
       })
       .then((res) => {
         if ([200, 204, 404].includes(res.data.status) || res.data.status === undefined) {
           getCart();
-          alert("Delete cart success");
+          toast.success("Xoá sản phẩm thành công");
         } else {
-          alert("Xóa giỏ hàng thất bại");
+          toast.error("Xoá sản phẩm thất bại");
         }
       })
-      .catch((error) => console.log(error));
+      .catch(() => toast.error("Xoá sản phẩm thất bại"));
   };
 
   const handleOrder = async (name: string, phone: string, address: string) => {
     try {
       const token = Cookies.get("token_portal");
-  
       const payload = {
         cart_ids: selectedItems.map((item) => item.id),
         total_price: totalPrice,
-        vat: vat,
+        vat,
         shipping_fee: shippingFee,
         final_total: finalTotal,
         receiver_name: name,
         receiver_phone: phone,
-        receiver_address: address
+        receiver_address: address,
       };
-  
-      const res = await axios.post(`http://127.0.0.1:8000/api/orders`, payload, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
+
+      const res = await axios.post("http://127.0.0.1:8000/api/orders", payload, {
+        headers: { Authorization: `Bearer ${token}` },
       });
-  
-      if (res.data.status === 200 || res.data.status === 201) {
+
+      if ([200, 201].includes(res.data.status)) {
         localStorage.removeItem("cart");
         Cookies.set("cart_count", "0");
         dispatch(setCount(0));
-        const orderData = {
-          ...res.data.data,
-          customer_info: {
-            name,
-            phone,
-            address
-          }
-        };
-  
-        router.push(`/invoice/${orderData.id}`);
+        router.push(`/invoice/${res.data.data.id}`);
       } else {
         alert("Đặt hàng thất bại");
       }
@@ -144,42 +151,26 @@ export const Cart: React.FC<Props> = ({ onBack, setNotify }) => {
       alert("Có lỗi xảy ra khi đặt hàng!");
     }
   };
-  useEffect(() => {
-    getCart();
-  }, []);
-
-  const formatVND = (amount: number) => {
-    return amount.toLocaleString("vi-VN", { style: "currency", currency: "VND" });
-  };
 
   const handleCheckoutClick = () => {
-    if (!token) {
-      setNotify?.("Please select product to order");
-      return;
-    }
-    if (selectedItems.length === 0) {
-      alert("Please select product to order!");
-      return;
-    }
+    if (!token) return setNotify?.("Please select product to order");
+    if (selectedItems.length === 0) return alert("Please select product to order!");
     setShowModal(true);
   };
 
   const handleSelectItem = (item: CartItem, isSelected: boolean) => {
-    if (isSelected) {
-      setSelectedItems((prev) => [...prev, item]);
-    } else {
-      setSelectedItems((prev) => prev.filter((i) => i.id !== item.id));
-    }
+    if (isSelected) setSelectedItems((prev) => [...prev, item]);
+    else setSelectedItems((prev) => prev.filter((i) => i.id !== item.id));
   };
 
   const handleSelectAll = (checked: boolean) => {
     setSelectAll(checked);
-    if (checked) {
-      setSelectedItems(cartItems);
-    } else {
-      setSelectedItems([]);
-    }
+    setSelectedItems(checked ? cartItems : []);
   };
+
+  function formatVND(amount: any) {
+    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+  }
 
   return (
     <>
@@ -187,82 +178,116 @@ export const Cart: React.FC<Props> = ({ onBack, setNotify }) => {
         <h2 className="cart-header">
           Giỏ hàng <i className="cart-header-icon-nav fa-solid fa-bag-shopping"></i>
         </h2>
+        {isLoadingCart ? (
+          <p style={{ textAlign: 'center' }}>Đang tải giỏ hàng...</p>
+        ) : cartItems.length === 0 ? (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', textAlign: 'center' }}>
+            <img src="http://127.0.0.1:8000/storage/images/cart.png" alt="empty cart" style={{ width: '360px', height: '300px', marginBottom: '16px' }} />
+            <p style={{ fontSize: '16px', marginBottom: '4px', color: '#333' }}>Giỏ hàng của bạn đang trống.</p>
+            <p style={{ fontSize: '14px', marginBottom: '20px', color: '#666' }}>Hãy chọn thêm sản phẩm để mua sắm nhé</p>
+            <button
+              style={{
+                padding: '10px 24px',
+                backgroundColor: '#01ab78',
+                border: 'none',
+                color: 'white',
+                borderRadius: '24px',
+                fontSize: '15px',
+                cursor: 'pointer'
+              }}
+              onClick={() => window.location.href = '/shop'}
+            >
+              Mua sắm ngay
+            </button>
+          </div>
+        ) : (
+          <>
+            <table className="cart-table">
+              <thead>
+                <tr className="cart-table-header">
+                  <th>Chọn</th>
+                  <th>Hình ảnh</th>
+                  <th>Sản phẩm</th>
+                  <th>Giá</th>
+                  <th>Số lượng</th>
+                  <th>Tổng</th>
+                  <th>Xóa</th>
+                </tr>
+              </thead>
+              <tbody>
+                {cartItems.map((item) => (
+                  <tr key={item.id}>
+                    <td><CheckboxSimple isChecked={selectedItems.some((i) => i.id === item.id)} onSelectItem={(val) => handleSelectItem(item, val)} /></td>
+                    <td><img src={`http://127.0.0.1:8000${item.image}`} alt={item.product_name} className="product-image" /></td>
+                    <td>{item.product_name}</td>
+                    <td>{formatVND(parseFloat(item.price))}</td>
+                    <td>
+                      <div className="quantity-cell-border">
+                        <span onClick={() => updateQuantity(item.id, -1, item.quantity, item.product_id)} className="quantity-btn btn-one">-</span>
+                        <span className="quantity">{item.quantity}</span>
+                        <span onClick={() => updateQuantity(item.id, 1, item.quantity, item.product_id)} className="quantity-btn btn-two">+</span>
+                      </div>
+                    </td>
+                    <td>{formatVND(parseFloat(item.price) * item.quantity)}</td>
+                    <td><i className="delete-btn fa-solid fa-trash" onClick={() => setConfirmDeleteId(item.id)}></i></td>
+                  </tr>
+                ))}
+                <tr>
+                  <td colSpan={7} className="text-left">
+                    <label className="flex items-center gap-2 font-medium cursor-pointer">
+                      <CheckboxSimple isChecked={selectAll} onSelectItem={handleSelectAll} />
+                      Chọn tất cả sản phẩm
+                    </label>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
 
-        <table className="cart-table">
-          <thead>
-            <tr className="cart-table-header">
-              <th className="cart-table-cell">Chọn</th>
-              <th className="cart-table-cell">Hình ảnh</th>
-              <th className="cart-table-cell">Sản phẩm</th>
-              <th className="cart-table-cell">Giá</th>
-              <th className="cart-table-cell">Số lượng</th>
-              <th className="cart-table-cell">Tổng</th>
-              <th className="cart-table-cell">Xóa</th>
-            </tr>
-          </thead>
-          <tbody>
-            {cartItems.map((item) => (
-              <tr key={item.id}>
-                <td className="cart-table-cell" style={{ width: "10px", paddingLeft: 20 }}>
-                  <CheckboxSimple
-                    onSelectItem={(val) => handleSelectItem(item, val)}
-                    isChecked={selectedItems.some((i) => i.id === item.id)}
-                  />
-                </td>
-                <td className="cart-table-cell">
-                  <img src={`http://127.0.0.1:8000${item.image}`} alt={item.product_name} className="product-image" />
-                </td>
-                <td className="cart-table-cell">{item.product_name}</td>
-                <td className="cart-table-cell">{formatVND(parseFloat(item.price))}</td>
-                <td className="cart-table-cell quantity-cell">
-                  <div className="quantity-cell-border">
-                    <span onClick={() => updateQuantity(item.id, -1, item.quantity, item.product_id)} className="quantity-btn btn-one">-</span>
-                    <span className="quantity">{item.quantity}</span>
-                    <span onClick={() => updateQuantity(item.id, 1, item.quantity, item.product_id)} className="quantity-btn btn-two">+</span>
-                  </div>
-                </td>
-                <td className="cart-table-cell">{formatVND(parseFloat(item.price) * item.quantity)}</td>
-                <td className="cart-table-cell">
-                  <div onClick={() => deleteCart(item.id)}>
-                    <i className="delete-btn fa-solid fa-trash"></i>
-                  </div>
-                </td>
-              </tr>
-            ))}
-            <tr>
-            <td className="cart-table-cell" colSpan={7} style={{ textAlign: "left", padding: "12px 20px" }}>
-  <label className="flex items-center gap-2 font-medium cursor-pointer">
-    <CheckboxSimple isChecked={selectAll} onSelectItem={handleSelectAll} />
-    Chọn tất cả sản phẩm
-  </label>
-</td>
+            <div className="cart-summary">
+              <p>Tổng giá: {formatVND(totalPrice)}</p>
+              <p>VAT (5%): {formatVND(vat)}</p>
+              <p>Phí vận chuyển: {formatVND(shippingFee)}</p>
+              <p className="font-bold">Thành tiền: {formatVND(finalTotal)}</p>
+            </div>
 
-            </tr>
-          </tbody>
-        </table>
+            <div className="footer-button">
+              <button className="checkout-btn" onClick={handleCheckoutClick}>Đặt hàng</button>
+            </div>
 
-        <div className="cart-summary">
-          <p>Tổng giá: {formatVND(totalPrice)}</p>
-          <p>VAT (5%): {formatVND(vat)}</p>
-          <p>Phí vận chuyển: {formatVND(shippingFee)}</p>
-          <p className="font-bold">Thành tiền: {formatVND(finalTotal)}</p>
-        </div>
+            {showModal && (
+              <CheckoutModal
+                onClose={() => setShowModal(false)}
+                onSubmit={({ name, phone, address }) => handleOrder(name, phone, address).then(() => setShowModal(false))}
+              />
+            )}
+          </>
+        )}
 
-        <div className="footer-button">
-          <button className="checkout-btn" onClick={handleCheckoutClick}>
-            Đặt hàng
-          </button>
-        </div>
+        {confirmDeleteId !== null && (
+          <div className="delete-confirm-overlay">
+            <div className="delete-confirm-modal">
+              <h3>Xác nhận xoá</h3>
+              <p>Bạn có chắc chắn muốn xoá sản phẩm này khỏi giỏ hàng?</p>
+              <div className="delete-confirm-buttons">
+                <button className="cancel-btn" onClick={() => setConfirmDeleteId(null)}>Hủy</button>
+                <button className="delete-btn" onClick={() => { deleteCart(confirmDeleteId!); setConfirmDeleteId(null); }}>Xoá</button>
+              </div>
+            </div>
+          </div>
+        )}
+        {confirmDeleteId !== null && (
+          <div className="delete-confirm-overlay">
+            <div className="delete-confirm-modal">
+              <h3>Xác nhận xoá</h3>
+              <p>Bạn có chắc chắn muốn xoá sản phẩm này khỏi giỏ hàng?</p>
+              <div className="delete-confirm-buttons">
+                <button className="cancel-btn" onClick={() => setConfirmDeleteId(null)}>Hủy</button>
+                <button className="delete-btn" onClick={() => { deleteCart(confirmDeleteId!); setConfirmDeleteId(null); }}>Xoá</button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
-
-      {showModal && (
-        <CheckoutModal
-          onClose={() => setShowModal(false)}
-          onSubmit={({ name, phone, address }) => {
-            handleOrder(name, phone, address).then(() => setShowModal(false));
-          }}
-        />
-      )}
     </>
   );
 };
@@ -283,7 +308,7 @@ const CheckboxSimple = ({ onSelectItem, isChecked = false }: { onSelectItem?: (v
         checked={checked}
         onChange={(e) => {
           setChecked(e.target.checked);
-          if (onSelectItem) onSelectItem(e.target.checked);
+          onSelectItem?.(e.target.checked);
         }}
         className="w-5 h-5 accent-blue-600"
       />
