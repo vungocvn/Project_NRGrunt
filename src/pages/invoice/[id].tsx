@@ -55,7 +55,14 @@ export default function InvoicePage() {
                     },
                 });
 
-                const invoice = orderRes.data.data;
+                const invoiceData = orderRes.data?.data || orderRes.data;
+                const invoice = Array.isArray(invoiceData) ? invoiceData[0] : invoiceData;
+
+                if (!invoice?.id) {
+                    console.error("Không có invoice.id", invoice);
+                    return;
+                }
+
                 const details = await getOrderDetails(invoice.id);
 
                 setBill({

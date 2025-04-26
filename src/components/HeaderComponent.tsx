@@ -260,7 +260,14 @@ export default function HeaderComponent({ onLogin, onRegister, fullName, onHome,
                             <i className="header-mobile-search-icon fa-solid fa-magnifying-glass"></i>
                         </label>
                         <div className="header-logo">
-                            <img src="../image/logo.png" alt="" className="header-logo-img" onClick={isHome == true ? onHome : handleBack} />
+                            <img src="/image/logo.png" alt="" className="header-logo-img" onClick={() => {
+                                if (isHome === true && onHome) {
+                                    onHome();
+                                } else {
+                                    router.push("/shop");
+                                }
+                            }}
+                            />
                         </div>
                         <input type="checkbox" hidden id="mobile-search-checkbox" className="header-search-checkbox " />
                         <div className="header-search">

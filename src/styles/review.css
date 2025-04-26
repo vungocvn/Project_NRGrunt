@@ -1,0 +1,141 @@
+.review-wrapper {
+  max-width: 800px;
+  margin: 120px auto;
+  padding: 0 16px;
+}
+
+.review-wrapper h2 {
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.review-item {
+  display: flex;
+  gap: 20px;
+  padding: 20px;
+  margin-bottom: 24px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.review-image {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.review-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.review-info h4 {
+  margin: 0 0 6px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.review-info p {
+  margin: 4px 0 10px;
+  color: #444;
+  font-size: 14px;
+}
+
+.review-form {
+  display: flex;
+  flex-direction: column;
+  margin-top: 12px;
+}
+
+.review-stars {
+  font-size: 22px;
+  margin-bottom: 8px;
+  user-select: none;
+}
+
+.review-stars span {
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.review-stars span:hover {
+  transform: scale(1.2);
+}
+
+.review-textarea {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  resize: vertical;
+  font-family: inherit;
+  font-size: 14px;
+  color: #333;
+  line-height: 1.4;
+}
+
+.review-submit-btn {
+  align-self: flex-start;
+  background-color: #01ab78;
+  color: white;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.25s ease;
+}
+
+.review-submit-btn:hover {
+  background-color: #01885f;
+}
+.btn-review {
+  padding: 8px 16px;
+  background-color: #01ab78;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.3s ease;
+  float: right;
+}
+
+.btn-review:hover {
+  background-color: #018d66;
+  box-shadow: 0 2px 6px rgba(1, 171, 120, 0.2);
+  transform: translateY(-1px);
+}
+
+.back-button {
+  display: inline-block;
+  margin: 32px auto 0;
+  padding: 12px 28px;
+  background-color: #01ab78;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 6px rgba(1, 171, 120, 0.2);
+}
+
+.back-button:hover {
+  background-color: #018d66;
+  box-shadow: 0 4px 12px rgba(1, 171, 120, 0.25);
+  transform: translateY(-1px);
+}

@@ -3,7 +3,6 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { useRouter } from "next/router";
 import { toast } from "react-toastify";
-
 export default function OrderHistory() {
   interface Order {
     id: number;
@@ -22,6 +21,8 @@ export default function OrderHistory() {
 
   const [orders, setOrders] = useState<Order[]>([]);
   const [filterStatus, setFilterStatus] = useState("all");
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [selectedProductId, setSelectedProductId] = useState<number | null>(null);
   const router = useRouter();
 
   function formatVND(amount: any) {
@@ -113,21 +114,19 @@ export default function OrderHistory() {
       <h2>Đơn hàng của tôi</h2>
 
       <div className="tab-status">
-        <button className={filterStatus === "all" ? "active" : ""} onClick={() => setFilterStatus("all")}>
-          Tất cả ({countByStatus.all})
-        </button>
-        <button className={filterStatus === "pending" ? "active" : ""} onClick={() => setFilterStatus("pending")}>
-          Chờ xác nhận ({countByStatus.pending})
-        </button>
-        <button className={filterStatus === "confirm" ? "active" : ""} onClick={() => setFilterStatus("confirm")}>
-          Đã xác nhận ({countByStatus.confirm})
-        </button>
-        <button className={filterStatus === "done" ? "active" : ""} onClick={() => setFilterStatus("done")}>
-          Đã hoàn thành ({countByStatus.done})
-        </button>
-        <button className={filterStatus === "cancel" ? "active" : ""} onClick={() => setFilterStatus("cancel")}>
-          Đã huỷ ({countByStatus.cancel})
-        </button>
+        {Object.entries(countByStatus).map(([key, value]) => (
+          <button
+            key={key}
+            className={filterStatus === key ? "active" : ""}
+            onClick={() => setFilterStatus(key)}
+          >
+            {key === "all" && `Tất cả (${value})`}
+            {key === "pending" && `Chờ xác nhận (${value})`}
+            {key === "confirm" && `Đã xác nhận (${value})`}
+            {key === "done" && `Đã hoàn thành (${value})`}
+            {key === "cancel" && `Đã huỷ (${value})`}
+          </button>
+        ))}
       </div>
 
       {orders.length === 0 ? (
@@ -137,47 +136,57 @@ export default function OrderHistory() {
           {orders
             .filter(statusFilter)
             .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-            .map((order) => {
-              console.log(order);
-              return (
-                <div
-                  className="order-card"
-                  key={order.id}
-                  onClick={() => handleCardClick(order.id)}
-                  style={{ cursor: "pointer" }}
-                >
-                  <div className="order-header">
-                    <div>
-                      <span>Ngày {new Date(order.created_at).toLocaleDateString()} | </span>
-                      <b>HD{order.id.toString().padStart(3, "0")}</b>
-                    </div>
-                    <span className={`status ${getStatusText(order).toLowerCase().replace(/\s/g, '-')}`}>
-                      {getStatusText(order)}
-                    </span>
+            .map((order) => (
+              <div
+                className="order-card"
+                key={order.id}
+                onClick={() => handleCardClick(order.id)}
+                style={{ cursor: "pointer" }}
+              >
+                <div className="order-header">
+                  <div>
+                    <span>Ngày {new Date(order.created_at).toLocaleDateString()} | </span>
+                    <b>HD{order.id.toString().padStart(3, "0")}</b>
                   </div>
+                  <span className={`status ${getStatusText(order).toLowerCase().replace(/\s/g, '-')}`}>
+                    {getStatusText(order)}
+                  </span>
+                </div>
 
-                  <div className="order-info">
-                    <p><strong>Khách hàng:</strong> {order.user?.name || "Không rõ"}</p>
-                    <p><strong>SĐT:</strong> {order.user?.phone || "Không rõ"}</p>
-                    <p><strong>Địa chỉ:</strong> {order.user?.address || "Không rõ"}</p>
-                  </div>
+                <div className="order-info">
+                  <p><strong>Khách hàng:</strong> {order.user?.name || "Không rõ"}</p>
+                  <p><strong>SĐT:</strong> {order.user?.phone || "Không rõ"}</p>
+                  <p><strong>Địa chỉ:</strong> {order.user?.address || "Không rõ"}</p>
+                </div>
 
-                  <div className="order-footer">
-                    <b>Thành tiền: {formatVND(order.final_total)}</b>
-                    <div style={{ display: "flex", gap: "12px" }}>
-                      {!order.is_canceled && !order.is_paid && (
-                        <button
-                          className="btn-cancel"
-                          onClick={(e) => handleCancelOrder(e, order.id)}
-                        >
-                          Huỷ đơn hàng
-                        </button>
-                      )}
-                    </div>
+                <div className="order-footer">
+                  <b>Thành tiền: {formatVND(order.final_total)}</b>
+                  <div style={{ display: "flex", gap: "12px", marginTop: "10px" }}>
+                    {!order.is_canceled && !order.is_paid && (
+                      <button
+                        className="btn-cancel"
+                        onClick={(e) => handleCancelOrder(e, order.id)}
+                      >
+                        Huỷ đơn hàng
+                      </button>
+                    )}
+
+                    {order.is_paid === 1 && order.is_confirmed === 1 && order.is_canceled === 0 && (
+                      <button
+                        className="btn-review" 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          router.push(`/orders/${order.id}/review`);
+                        }}
+                      >
+                        Đánh giá sản phẩm
+                      </button>
+                    )}
+
                   </div>
                 </div>
-              );
-            })}
+              </div>
+            ))}
         </div>
       )}
     </div>

@@ -8,6 +8,8 @@ import "@/styles/globals.css";
 import "@/styles/forgot.css";
 import "@/styles/history.css";
 import "@/styles/logout.css";
+import "leaflet/dist/leaflet.css";
+import "@/styles/review.css";
 import type { AppProps } from "next/app";
 import { ReduxProvider } from "@/store/provider";
 import  { FooterComponents } from "@/components/FooterCom";

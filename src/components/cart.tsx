@@ -53,19 +53,19 @@ export const Cart: React.FC<Props> = ({ onBack, setNotify }) => {
   }, [totalPrice, shippingFee]);
 
   useEffect(() => {
-    getCart(); 
+    getCart();
   }, []);
-  
+
   const getCart = () => {
     setIsLoadingCart(true);
     const token = Cookies.get("token_portal");
-  
+
     if (!token) {
-      setCartItems([]); 
+      setCartItems([]);
       setIsLoadingCart(false);
       return;
     }
-  
+
     axios
       .get(`http://127.0.0.1:8000/api/carts`, {
         params: { page: 1, page_size: 100 },
@@ -82,8 +82,8 @@ export const Cart: React.FC<Props> = ({ onBack, setNotify }) => {
       .catch((error) => console.log(error))
       .finally(() => setIsLoadingCart(false));
   };
-  
-  
+
+
 
   const updateCart = (cart_id: number, product_id: number, quantity: number) => {
     axios
@@ -161,10 +161,17 @@ export const Cart: React.FC<Props> = ({ onBack, setNotify }) => {
   };
 
   const handleCheckoutClick = () => {
-    if (!token) return setNotify?.("Please select product to order");
-    if (selectedItems.length === 0) return alert("Please select product to order!");
+    if (!token) {
+      toast.warning("Bạn cần đăng nhập để đặt hàng!");
+      return;
+    }
+    if (selectedItems.length === 0) {
+      toast.warning("Vui lòng chọn ít nhất một sản phẩm để đặt hàng!");
+      return;
+    }
     setShowModal(true);
   };
+
 
   const handleSelectItem = (item: CartItem, isSelected: boolean) => {
     if (isSelected) setSelectedItems((prev) => [...prev, item]);
@@ -178,111 +185,108 @@ export const Cart: React.FC<Props> = ({ onBack, setNotify }) => {
 
   function formatVND(amount: any) {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
-}
+  }
 
   return (
     <>
       <div className="cart-container container-one">
-        {/* <h2 className="cart-header">
-          Giỏ hàng <i className="cart-header-icon-nav fa-solid fa-bag-shopping"></i>
-        </h2> */}
         {isLoadingCart ? (
-  <p style={{ textAlign: 'center' }}>Đang tải giỏ hàng...</p>
-) : cartItems.length === 0 ? (
-  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', textAlign: 'center' }}>
-    <img src="http://127.0.0.1:8000/storage/images/cart.png" alt="empty cart" style={{ width: '360px', height: '300px', marginBottom: '16px' }} />
-    <p style={{ fontSize: '16px', marginBottom: '4px', color: '#333' }}>Giỏ hàng của bạn đang trống.</p>
-    <p style={{ fontSize: '14px', marginBottom: '20px', color: '#666' }}>Hãy chọn thêm sản phẩm để mua sắm nhé</p>
-    <button
-      style={{
-        padding: '10px 24px',
-        backgroundColor: '#01ab78',
-        border: 'none',
-        color: 'white',
-        borderRadius: '24px',
-        fontSize: '15px',
-        cursor: 'pointer'
-      }}
-      onClick={() => window.location.href = '/shop'}
-    >
-      Mua sắm ngay
-    </button>
-  </div>
-) : (
-  <>
-    <table className="cart-table">
-      <thead>
-        <tr className="cart-table-header">
-          <th>Chọn</th>
-          <th>Hình ảnh</th>
-          <th>Sản phẩm</th>
-          <th>Giá</th>
-          <th>Số lượng</th>
-          <th>Tổng</th>
-          <th>Xóa</th>
-        </tr>
-      </thead>
-      <tbody>
-        {cartItems.map((item) => (
-          <tr key={item.id}>
-            <td><CheckboxSimple isChecked={selectedItems.some((i) => i.id === item.id)} onSelectItem={(val) => handleSelectItem(item, val)} /></td>
-            <td><img src={`http://127.0.0.1:8000${item.image}`} alt={item.product_name} className="product-image" /></td>
-            <td>{item.product_name}</td>
-            <td>{formatVND(parseFloat(item.price))}</td>
-            <td>
-              <div className="quantity-cell-border">
-                <span onClick={() => updateQuantity(item.id, -1, item.quantity, item.product_id)} className="quantity-btn btn-one">-</span>
-                <span className="quantity">{item.quantity}</span>
-                <span onClick={() => updateQuantity(item.id, 1, item.quantity, item.product_id)} className="quantity-btn btn-two">+</span>
+          <p style={{ textAlign: 'center' }}>Đang tải giỏ hàng...</p>
+        ) : cartItems.length === 0 ? (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', textAlign: 'center' }}>
+            <img src="http://127.0.0.1:8000/storage/images/cart.png" alt="empty cart" style={{ width: '360px', height: '300px', marginBottom: '16px' }} />
+            <p style={{ fontSize: '16px', marginBottom: '4px', color: '#333' }}>Giỏ hàng của bạn đang trống.</p>
+            <p style={{ fontSize: '14px', marginBottom: '20px', color: '#666' }}>Hãy chọn thêm sản phẩm để mua sắm nhé</p>
+            <button
+              style={{
+                padding: '10px 24px',
+                backgroundColor: '#01ab78',
+                border: 'none',
+                color: 'white',
+                borderRadius: '24px',
+                fontSize: '15px',
+                cursor: 'pointer'
+              }}
+              onClick={() => window.location.href = '/shop'}
+            >
+              Mua sắm ngay
+            </button>
+          </div>
+        ) : (
+          <>
+            <table className="cart-table">
+              <thead>
+                <tr className="cart-table-header">
+                  <th>Chọn</th>
+                  <th>Hình ảnh</th>
+                  <th>Sản phẩm</th>
+                  <th>Giá</th>
+                  <th>Số lượng</th>
+                  <th>Tổng</th>
+                  <th>Xóa</th>
+                </tr>
+              </thead>
+              <tbody>
+                {cartItems.map((item) => (
+                  <tr key={item.id}>
+                    <td><CheckboxSimple isChecked={selectedItems.some((i) => i.id === item.id)} onSelectItem={(val) => handleSelectItem(item, val)} /></td>
+                    <td><img src={`http://127.0.0.1:8000${item.image}`} alt={item.product_name} className="product-image" /></td>
+                    <td>{item.product_name}</td>
+                    <td>{formatVND(parseFloat(item.price))}</td>
+                    <td>
+                      <div className="quantity-cell-border">
+                        <span onClick={() => updateQuantity(item.id, -1, item.quantity, item.product_id)} className="quantity-btn btn-one">-</span>
+                        <span className="quantity">{item.quantity}</span>
+                        <span onClick={() => updateQuantity(item.id, 1, item.quantity, item.product_id)} className="quantity-btn btn-two">+</span>
+                      </div>
+                    </td>
+                    <td>{formatVND(parseFloat(item.price) * item.quantity)}</td>
+                    <td><i className="delete-btn fa-solid fa-trash" onClick={() => setConfirmDeleteId(item.id)}></i></td>
+                  </tr>
+                ))}
+                <tr>
+                  <td colSpan={7} className="text-left">
+                    <label className="flex items-center gap-2 font-medium cursor-pointer">
+                      <CheckboxSimple isChecked={selectAll} onSelectItem={handleSelectAll} />
+                      Chọn tất cả sản phẩm
+                    </label>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div className="cart-summary">
+              <p>Tổng giá: {formatVND(totalPrice)}</p>
+              <p>VAT (5%): {formatVND(vat)}</p>
+              <p>Phí vận chuyển: {formatVND(shippingFee)}</p>
+              <p className="font-bold">Thành tiền: {formatVND(finalTotal)}</p>
+            </div>
+
+            <div className="footer-button">
+              <button className="checkout-btn" onClick={handleCheckoutClick}>Đặt hàng</button>
+            </div>
+
+            {showModal && (
+              <CheckoutModal
+                onClose={() => setShowModal(false)}
+                onSubmit={({ name, phone, address }) => handleOrder(name, phone, address).then(() => setShowModal(false))}
+              />
+            )}
+          </>
+        )}
+
+        {confirmDeleteId !== null && (
+          <div className="delete-confirm-overlay">
+            <div className="delete-confirm-modal">
+              <h3>Xác nhận xoá</h3>
+              <p>Bạn có chắc chắn muốn xoá sản phẩm này khỏi giỏ hàng?</p>
+              <div className="delete-confirm-buttons">
+                <button className="cancel-btn" onClick={() => setConfirmDeleteId(null)}>Hủy</button>
+                <button className="delete-btn" onClick={() => { deleteCart(confirmDeleteId!); setConfirmDeleteId(null); }}>Xoá</button>
               </div>
-            </td>
-            <td>{formatVND(parseFloat(item.price) * item.quantity)}</td>
-            <td><i className="delete-btn fa-solid fa-trash" onClick={() => setConfirmDeleteId(item.id)}></i></td>
-          </tr>
-        ))}
-        <tr>
-          <td colSpan={7} className="text-left">
-            <label className="flex items-center gap-2 font-medium cursor-pointer">
-              <CheckboxSimple isChecked={selectAll} onSelectItem={handleSelectAll} />
-              Chọn tất cả sản phẩm
-            </label>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-
-    <div className="cart-summary">
-      <p>Tổng giá: {formatVND(totalPrice)}</p>
-      <p>VAT (5%): {formatVND(vat)}</p>
-      <p>Phí vận chuyển: {formatVND(shippingFee)}</p>
-      <p className="font-bold">Thành tiền: {formatVND(finalTotal)}</p>
-    </div>
-
-    <div className="footer-button">
-      <button className="checkout-btn" onClick={handleCheckoutClick}>Đặt hàng</button>
-    </div>
-
-    {showModal && (
-      <CheckoutModal
-        onClose={() => setShowModal(false)}
-        onSubmit={({ name, phone, address }) => handleOrder(name, phone, address).then(() => setShowModal(false))}
-      />
-    )}
-  </>
-)}
-
-{confirmDeleteId !== null && (
-  <div className="delete-confirm-overlay">
-    <div className="delete-confirm-modal">
-      <h3>Xác nhận xoá</h3>
-      <p>Bạn có chắc chắn muốn xoá sản phẩm này khỏi giỏ hàng?</p>
-      <div className="delete-confirm-buttons">
-        <button className="cancel-btn" onClick={() => setConfirmDeleteId(null)}>Hủy</button>
-        <button className="delete-btn" onClick={() => { deleteCart(confirmDeleteId!); setConfirmDeleteId(null); }}>Xoá</button>
-      </div>
-    </div>
-  </div>
-) }
+            </div>
+          </div>
+        )}
         {confirmDeleteId !== null && (
           <div className="delete-confirm-overlay">
             <div className="delete-confirm-modal">

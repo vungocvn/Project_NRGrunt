@@ -248,6 +248,21 @@
         border-radius: 2px;
       }
     }
+    .btn-review {
+      background-color: #01ab78;
+      color: white;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    
+    .btn-review:hover {
+      background-color: #01986d;
+    }
+    
   }
   
   
