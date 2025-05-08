@@ -1,75 +1,90 @@
 /* src/styles/logoutModalClient.css */
+
 .logout-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.3);
-    z-index: 9999;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.logout-modal {
+  background: white;
+  border-radius: 8px;
+  padding: 16px 20px;
+  width: 300px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  animation: fadeIn 0.25s ease;
+}
+
+.logout-title {
+  color: #e60073;
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.logout-message {
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 16px;
+}
+
+.logout-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.btn-cancel {
+  background: #eee;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-cancel:hover {
+  background: #ddd;
+}
+
+.btn-confirm {
+  background: #e60073;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-confirm:hover {
+  background: #cc0066;
+}
+
+@keyframes fadeIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
   }
-  
-  .logout-modal {
-    background: white;
-    border-radius: 8px;
-    padding: 16px 20px;
-    width: 300px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    animation: fadeIn 0.25s ease;
+  to {
+    transform: scale(1);
+    opacity: 1;
   }
-  
-  .logout-title {
-    color: #e60073;
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 8px;
-  }
-  
-  .logout-message {
-    font-size: 14px;
-    color: #333;
-    margin-bottom: 16px;
-  }
-  
-  .logout-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-  }
-  
-  .btn-cancel {
-    background: #eee;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  .btn-cancel:hover {
-    background: #ddd;
-  }
-  
-  .btn-confirm {
-    background: #e60073;
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  .btn-confirm:hover {
-    background: #cc0066;
-  }
-  
-  @keyframes fadeIn {
-    from {
-      transform: scale(0.9);
-      opacity: 0;
-    }
-    to {
-      transform: scale(1);
-      opacity: 1;
-    }
-  }
-  
+}
+
+/* Thông báo Đã đăng xuất */
+.logout-status-message {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: --var(--primary-color);
+  color: white;
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 16px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  z-index: 9999;
+}

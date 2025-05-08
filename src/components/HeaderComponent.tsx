@@ -16,7 +16,7 @@ export default function HeaderComponent({ onLogin, onRegister, fullName, onHome,
     const router = useRouter();
     const [showLogoutModal, setShowLogoutModal] = useState(false);
     const { isLogin, user, token, count } = useSelector((state: any) => ({
-        isLogin: state.auth.isLogin, // false
+        isLogin: state.auth.isLogin, 
         user: state.auth.user,
         token: state.auth.token,
         count: state.product.count
@@ -28,7 +28,6 @@ export default function HeaderComponent({ onLogin, onRegister, fullName, onHome,
         const prev = document.referrer;
 
         if (prev.includes("/cart") || prev.includes("/invoice")) {
-            // nếu đến từ trang đặt hàng hoặc giỏ hàng thì quay về shop thay vì back
             router.push("/shop");
         } else if (window.history.length > 1) {
             router.back();
@@ -131,8 +130,6 @@ export default function HeaderComponent({ onLogin, onRegister, fullName, onHome,
             fetchCartCount();
         }
     }, [isLogin, token]);
-
-
     useEffect(() => {
         if (token && token !== "") {
             axios

@@ -30,26 +30,22 @@ export const ProdDetail: React.FC<Props> = ({ onBack, idProduct }) => {
   const dispatch = useDispatch();
   const router = useRouter();
   const { id } = router.query;
-
   const [token, setToken] = useState<string>("");
   const [quantity, setQuantity] = useState(1);
   const [product, setProduct] = useState<Productdetails>({
-    id: 1,
-    name: "tivi",
+    id: 0,
+    name: "",
     status: 1,
     price: 12000,
-    image: "storage/images/ottpJefChM.jpg",
+    image: "",
     quantity: 100,
-    origin: "Việt Nam",
+    origin: "",
     discount: 0,
-    description: "Tivi thì để xem thôi chứ làm gì?",
+    description: "",
     created_at: "2025-03-01 13:39:24",
     updated_at: "2025-03-01 13:39:24",
     category_id: 1,
   });
-
-  const [isExpanded, setIsExpanded] = useState(false);
-
   useEffect(() => {
     const token = Cookies.get("token_portal") || "";
     if (token) setToken(token);
@@ -70,7 +66,7 @@ export const ProdDetail: React.FC<Props> = ({ onBack, idProduct }) => {
       window.scrollTo({ top: y, behavior: "smooth" });
     }
   }, [product]);
-
+  const [isExpanded, setIsExpanded] = useState(false);
   function getCart() {
     const token = Cookies.get("token_portal") || "";
     axios.get(`http://127.0.0.1:8000/api/carts`, {
@@ -98,7 +94,7 @@ export const ProdDetail: React.FC<Props> = ({ onBack, idProduct }) => {
       .then((res) => {
         if (res.data.status === 200) {
           if (type === "buy") router.push("/cart");
-          else toast.success("Add to cart successfully!", { position: "top-right", autoClose: 2000 });
+          else toast.success("Add to cart successfully!");
           getCart();
         } else {
           toast.error("Add to cart error!", { position: "top-right" });
@@ -119,7 +115,30 @@ export const ProdDetail: React.FC<Props> = ({ onBack, idProduct }) => {
       currency: "VND",
     });
   }
-
+  interface Review {
+    user_name: string;
+    rating: number;
+    comment: string;
+    created_at: string;
+  }
+  const [reviews, setReviews] = useState<Review[]>([]);
+  useEffect(() => {
+    axios.get(`http://127.0.0.1:8000/api/products/${idProduct}`)
+      .then((res) => {
+        if (res.data.status === 200) setProduct(res.data.data);
+        else alert("Sign up error, please try again!");
+      })
+      .catch(() => alert("Sign up error, please try again!"));
+    axios.get(`http://127.0.0.1:8000/api/reviews/${idProduct}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => {
+        if (res.data.status === 200) setReviews(res.data.data);
+      })
+      .catch((err) => {
+        console.error("Error fetching reviews:", err);
+      });
+  }, [idProduct]);
   return (
     <div className="product-container">
       <div className="product-cover">
@@ -230,6 +249,21 @@ export const ProdDetail: React.FC<Props> = ({ onBack, idProduct }) => {
           </div>
         </div>
       </div>
+      <div className="product-reviews">
+        <h3>Đánh giá sản phẩm</h3>
+        {reviews.length > 0 ? (
+          reviews.map((review, index) => (
+            <div key={index} className="review-item">
+              <p><strong>{review.user_name}</strong> - {review.created_at}</p>
+              <p>Đánh giá: {review.rating} / 5</p>
+              <p>{review.comment}</p>
+            </div>
+          ))
+        ) : (
+          <p></p>
+        )}
+      </div>
+
     </div>
   );
 };
